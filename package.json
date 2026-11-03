@@ -1,0 +1,12 @@
+{
+  "name": "educ-ci-apk",
+  "version": "1.0.0",
+  "description": "Serveur de téléchargement APK EDUC CI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

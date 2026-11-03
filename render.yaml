@@ -1,0 +1,13 @@
+# EDUC CI — Configuration Render (runtime Node.js)
+services:
+  - type: web
+    name: educ-ci-apk
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+    autoDeploy: true
