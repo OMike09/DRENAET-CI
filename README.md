@@ -1,18 +1,15 @@
-# DRENAET CI — application et bureau administratif numérique (colis 11)
+# DRENAET CI — application intégrée (colis 12)
 
-Application Node.js/PostgreSQL pour les directions régionales et établissements. **Le colis 11 enrichit le registre de courriers existant sans le dupliquer** et préserve la Vue d’ensemble, les Statistiques, l’Observatoire régional, les Exports, les groupes et toutes les autres fonctions déjà présentes. Voir [le guide du colis 11](ETAPE_11_BUREAU_COURRIER_NUMERIQUE.md) avant l’installation.
+Application Node.js/PostgreSQL pour les directions régionales et les établissements. Le **colis 12 ajoute la formation continue** aux modules précédents, sans les remplacer. Lire [le guide d’installation et de fonctionnement du colis 12](ETAPE_12_FORMATION_CONTINUE.md) avant de copier le ZIP delta.
 
 ## Modules conservés
 
-- Comptes nominatifs, hiérarchie, sessions privées, protection CSRF et journal d’audit ; instructions, missions et alertes.
-- Messagerie privée, rapports à circuits paramétrables, bibliothèque et agenda ; statistiques administratives, notifications et push web facultatif.
-- Pièces privées incluant notes vocales (quota actuel borné, réglage administrateur), courriers historiques et groupes privés.
-- Rappels automatiques sans doublons, exports historiques CSV/PDF/Excel et Observatoire régional (fiches déclarées et validées, primaire/secondaire, carte géolocalisée et rapports).
+Comptes nominatifs, rôles, établissements, sessions privées, protection CSRF et audit ; instructions, missions, messagerie, rapports, bibliothèque et agenda ; statistiques, notifications, push facultatif ; pièces privées et notes vocales ; groupes et registre historique des courriers, bureau du courrier numérique, rappels et exports ; Observatoire primaire/secondaire avec carte et fiches validées.
 
-## Colis 11 : nouveau traitement du courrier dans le registre existant
+## Formation continue
 
-Courrier entrant/sortant, numérotation transactionnelle, catégories/année/service, scan et pièces privées, modèles, circuits hiérarchiques configurés par les responsables, accusés de réception, suivi des traitements, validation/visa nominatif, PDF, archivage sans suppression et recherche. Quatre niveaux de confidentialité avec accès nominatif strict pour les deux niveaux supérieurs ; alertes et échéances intégrées. L’envoi externe par courriel pour un **sortant normal** exige un fournisseur SMTP privé configuré. Un visa interne n’est pas une signature électronique certifiée ; l’acceptation SMTP n’est pas une preuve de réception par le destinataire.
+Catalogue par domaine/discipline et public cible, calendrier de séances, comptes formateurs désignés par un responsable, publication contrôlée, invitations/inscriptions et liste d’attente, présence, évaluations QCM/réponse courte/exercice pratique, résultats et espace personnel. Supports PDF/PPTX/images/petites vidéos stockés directement en PostgreSQL (**10 Mio par fichier**, quota initial **100 Mio**, administrable jusqu’à **500 Mio au total**). Besoins de formation, rappels, tableau régional et exports PDF/Excel. **Le formateur propose une attestation ; seul un responsable habilité peut la valider avant création du PDF et de la référence vérifiable.** La référence de vérification ne doit pas être publiée sans nécessité. Ce palier ne prend pas en charge les longues vidéos ou les gigaoctets.
 
 ## Installation et tests
 
-Node.js >=20, PostgreSQL direct non poolé, variables privées selon `.env.example`. Faire une **sauvegarde/restauration testée** et confirmer les migrations 001–010 avant d’ajouter la migration 011. Copier les fichiers du ZIP aux mêmes chemins **sans effacer ceux déjà installés**. `npm ci`, puis `npm start`. Ne jamais exposer les secrets SMTP ou de base de données dans le dépôt. Les tests avec PostgreSQL jetable et Chromium sont détaillés dans [le guide du colis 11](ETAPE_11_BUREAU_COURRIER_NUMERIQUE.md). **33/33 tests locaux réussis ; aucun déploiement ni test authentifié de ce colis en production par l’agent.** Le statut « colis 10 installé » est celui rapporté par l’utilisateur, non vérifié directement sur la base privée.
+Node.js ≥ 20, PostgreSQL direct non poolé, variables privées selon `.env.example`. Le colis 11 et les migrations **001–011** doivent être présents avant le colis 12 ; vérifier cette condition **sur la base ciblée**, effectuer sauvegarde et restauration de contrôle. Copier les fichiers du ZIP delta aux chemins indiqués **sans effacer les autres fichiers**, exécuter `npm ci`, puis démarrer. La migration 012 est appliquée par l’application au démarrage. Ne jamais publier les secrets de base, SMTP ou push. Commande de test PostgreSQL isolé et Chromium dans [le guide](ETAPE_12_FORMATION_CONTINUE.md). **36/36 tests locaux réussis ; aucun déploiement ni test authentifié du colis 12 en production par l’agent.** L’installation du colis 11 a été rapportée par l’utilisateur, non vérifiée directement sur Neon/Render.

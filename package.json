@@ -1,8 +1,8 @@
 {
   "name": "drenaet-ci",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "private": true,
-  "description": "DRENAET CI — colis 11 : bureau administratif numérique additif",
+  "description": "DRENAET CI — colis 12 : formation continue intégrée",
   "engines": {
     "node": ">=20"
   },
