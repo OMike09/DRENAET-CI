@@ -1,56 +1,52 @@
-# EDUC CI — Service de téléchargement APK (pour Render)
+# DRENAET CI — étape 1 (projet web séparé)
 
-Ce dossier est un **service web autonome** qui sert l'APK EDUC CI au téléchargement.
-Il est conçu pour être **copié dans votre repo `drenaet-ci` existant** (sous-dossier)
-et déployé comme **nouveau service** sur Render.
+**Statut : prototype fonctionnel testé localement sur PostgreSQL réel, non déployé sur le Render existant.** Les instructions, tâches, messagerie, rapports, bibliothèque, calendrier, statistiques métiers et notifications ne sont pas encore livrés. Aucun écran ne prétend le contraire. Ne pas remplacer l'APK EDUC CI ni supprimer ses données.
 
-## Contenu
-- `server.js` — serveur Node.js léger (pas de dépendances externes)
-- `package.json` — manifeste Node
-- `Dockerfile` — image Docker pour Render
-- `render.yaml` — configuration du service Render
-- `EDUC_CI_v1.0.0.apk` — l'application Android (65 KB)
+## Contenu réellement opérationnel
 
-## Comment l'intégrer dans votre repo `drenaet-ci`
+- Entrée web responsive sans comptes élève/parent et sans faux comptes de démonstration.
+- Création initiale unique d'un administrateur général à partir d'identifiants **privés** de démarrage ; jamais réinitialisé à chaque redémarrage.
+- Sessions HTTP-only, 12 heures, CSRF, restrictions d'origine, mots de passe dérivés par scrypt salé, protection contre les essais répétés ; cookies `Secure` lorsque la requête arrive par HTTPS (proxy Render pris en compte).
+- Première connexion avec code provisoire aléatoire à usage unique, expiration à 7 jours, puis choix d'un secret personnel de 12 à 128 caractères. Réinitialisation par un supérieur habilité, invalidation des sessions.
+- Directions régionales multiples, établissements et services ; affectations et listes filtrées serveur par direction/établissement. Journal des opérations d'administration append-only (déclencheur SQL).
+- Administrateur général : directions, unités, collaborateurs non généraux, labels de fonctions et journal global. Directeur régional : unités et collaborateurs de sa région, journal de sa région. Chef d'établissement : subordonnés de son établissement. Autres rôles : profil et tableau de bord en lecture de leur seul périmètre.
+- Noms des fonctions ajustables par administrateur général ; clés de rôle et plafonds d'attribution protégés côté serveur. Les chemins complets des instructions et autres délégations hiérarchiques sont prévus **dans les étapes ultérieures**, pas présentés comme livrés ici.
+- Migrations versionnées et non destructives dans le schéma PostgreSQL isolé `drenaet_ci`, même si une base existante contient d'autres tables dans `public`.
 
-### Option 1 — Copier le dossier (recommandé)
-1. Copier ce dossier `educ-ci-apk/` dans votre repo `drenaet-ci`.
-2. Si votre repo a déjà un `render.yaml`, **fusionner** la section de service ci-dessous
-   dans votre fichier existant (ne pas avoir deux fichiers `render.yaml`).
-3. Pousser sur GitHub : `git add educ-ci-apk && git commit -m "APK EDUC CI" && git push`
-4. Render détecte le changement et deploye automatiquement (ou cliquez « Deploy » dans le dashboard).
+## Installer sur un service Node.js distinct, après sauvegarde de l'existant
 
-### Option 2 — Service séparé
-Si vous voulez un service Render séparé pour l'APK, gardez ce `render.yaml` tel quel
-et assurez-vous qu'il est le `render.yaml` racine du repo (ou renommez le votre et
-placez celui-ci en racine temporairement).
+Node.js >=20. Ne configurez **pas** les mots de passe ou URL de base dans les fichiers, le dépôt, un ZIP public ou une capture d'écran.
 
-## Section `render.yaml` à fusionner
-
-```yaml
-services:
-  - type: web
-    name: educ-ci-apk
-    runtime: docker
-    plan: free
-    dockerfilePath: ./educ-ci-apk/Dockerfile
-    healthCheckPath: /
-    envVars:
-      - key: PORT
-        value: "10000"
-    autoDeploy: true
+```text
+npm install
+npm start
 ```
 
-> Si votre repo utilise déjà un Dockerfile racine, orientez `dockerfilePath` vers
-> `./educ-ci-apk/Dockerfile`. Si vous utilisez le runtime Node (pas Docker), remplacez
-> `runtime: docker` par `runtime: node` et supprimez `dockerfilePath`.
+Variables **à définir dans l'interface privée du service Render**, sans changer arbitrairement les variables déjà présentes :
 
-## URLs après déploiement
-- Page de présentation : `https://<app>.onrender.com/`
-- Téléchargement direct : `https://<app>.onrender.com/EDUC_CI_v1.0.0.apk`
-- Chemin alternatif : `https://<app>.onrender.com/download`
+- `DATABASE_URL` : URL de la base PostgreSQL dédiée, à confirmer par l'administrateur. Utiliser un compte SQL avec permissions limitées à ce projet. Si le service exige TLS, configurer PostgreSQL et ses certificats conformément aux paramètres du fournisseur ; ne pas désactiver la vérification TLS par défaut.
+- `BOOTSTRAP_LOGIN` : identifiant de l'administrateur général à créer **uniquement si la table des comptes DRENAET CI est vide**.
+- `BOOTSTRAP_PASSWORD` : secret initial robuste de cet administrateur, strictement privé ; une fois le premier compte créé, la variable ne le réinitialise plus. Retirer la variable de démarrage après la création et déplacer le secret dans le gestionnaire de mots de passe institutionnel.
+- `PORT` : défini automatiquement par Render.
+- `DRENAET_ALLOW_PREVIEW=1` : réservé exclusivement à un aperçu local intégré ; **ne jamais l'activer en production** (désactive la protection anti-intégration dans une iframe pour cet aperçu).
 
-## Comptes de démonstration (dans l'APK)
-`admin/admin123` · `dre.adzope/1234` · `dre.katiola/1234` · `insp.adzope/1234` ·
-`chef.epaz/1234` · `chef.lycee/1234` · `censeur/1234` · `edu.lycee/1234` ·
-`ens.math/1234` · `ens.fr/1234`
+**IMPORTANT :** l'absence de `DATABASE_URL` ou du secret initial au premier démarrage fait échouer le service de façon explicite ; il n'y a ni base locale silencieuse ni comptes publics de démonstration. La sauvegarde réelle et la connexion à la base Render ne peuvent pas être vérifiées depuis cet environnement sans accès autorisé. Ne pas redéployer le service qui héberge actuellement l'APK avant d'avoir identifié son dépôt, sauvegardé son éventuel stockage et décidé du remplacement.
+
+### Vérifications locales
+
+```text
+npm test
+TEST_DATABASE_URL=postgres://... npm test
+AC_RUN_BROWSER_TESTS=1 TEST_DATABASE_URL=postgres://... npm test
+```
+
+La suite sans URL locale exécute les tests unitaires et ignore intentionnellement l'intégration PostgreSQL et Chromium. La suite avec URL de **test seulement**, dont l'utilisateur SQL peut créer/supprimer ses bases, crée des bases temporaires, teste API et navigateur et les détruit ensuite. Ne jamais définir `TEST_DATABASE_URL` sur la base de production. Chromium nécessite `npx playwright install chromium` et ses dépendances système. Le test vérifie l'activation, l'isolation de deux directions, les interdictions d'escalade, les sessions invalidées, l'audit et les données conservées après redémarrage.
+
+## Séquence prudente pour l'intégration
+
+1. Identifier le **nouveau dépôt** relié au Web Service visé ; examiner sa configuration et les variables **par nom seulement**. Ne pas téléverser ce dossier sur l'ancien service EDUC CI par erreur.
+2. Faire sauvegarder la vraie base PostgreSQL avec un plan de restauration testé sur une base distincte ; ne jamais effacer un schéma existant.
+3. Déployer ce projet web sur un service Node.js distinct ou après décision explicite de bascule, puis vérifier `/healthz`, `/api/auth/session`, login initial, création de 2 directions, isolation et reconnexion après redémarrage Render.
+4. Inventorier les données éventuellement conservées dans des appareils utilisant l'APK antérieur. Leur export/import (et le traitement des données relatives aux élèves) nécessitent un accord, un schéma et un test de migration séparés. Aucun import ni effacement n'est effectué dans l'étape 1.
+
+Voir [ETAPE_1_DIAGNOSTIC_ET_ARCHITECTURE.md](ETAPE_1_DIAGNOSTIC_ET_ARCHITECTURE.md) pour le diagnostic, les décisions de hiérarchie et les étapes suivantes.

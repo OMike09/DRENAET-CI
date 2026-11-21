@@ -1,12 +1,10 @@
 {
-  "name": "educ-ci-apk",
-  "version": "1.0.0",
-  "description": "Serveur de téléchargement APK EDUC CI",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "engines": {
-    "node": ">=18"
-  }
+  "name": "drenaet-ci",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DRENAET CI — étape 1 : identité, hiérarchie et isolation des directions régionales",
+  "engines": {"node": ">=20"},
+  "scripts": {"start": "node server.js", "test": "node --test tests/*.test.js"},
+  "dependencies": {"express": "^4.21.2", "pg": "^8.16.3"},
+  "devDependencies": {"playwright": "^1.65.1"}
 }

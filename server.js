@@ -1,66 +1,61 @@
-/* EDUC CI — Serveur de téléchargement APK pour Render */
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-
-const PORT = process.env.PORT || 10000;
-const APK = path.join(__dirname, 'EDUC_CI_v1.0.0.apk');
-const APK_NAME = 'EDUC_CI_v1.0.0.apk';
-
-const server = http.createServer((req, res) => {
-  const url = (req.url || '/').split('?')[0];
-
-  // Téléchargement direct de l'APK (chemins explicites)
-  if (url === '/download' || url === '/' + APK_NAME || url === '/apk' || url === '/EDUC_CI_v1.0.0.apk') {
-    try {
-      const stat = fs.statSync(APK);
-      res.writeHead(200, {
-        'Content-Type': 'application/vnd.android.package-archive',
-        'Content-Length': stat.size,
-        'Content-Disposition': 'attachment; filename="' + APK_NAME + '"'
-      });
-      fs.createReadStream(APK).pipe(res);
-      return;
-    } catch (e) {
-      res.writeHead(500, { 'Content-Type': 'text/plain' });
-      res.end('APK non trouvé');
-      return;
-    }
-  }
-
-  // Page de présentation avec bouton de téléchargement
-  res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-  res.end(`<!doctype html>
-<html lang="fr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>EDUC CI — APK</title>
-<style>
-  body{font-family:"Segoe UI",Roboto,Arial,sans-serif;background:#1B5E20;color:#fff;text-align:center;padding:60px 20px;margin:0}
-  .card{background:#fff;color:#1E2A23;border-radius:20px;padding:40px 30px;max-width:480px;margin:0 auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-  h1{color:#1B5E20;margin:0 0 8px;letter-spacing:2px}
-  .sub{color:#63746A;font-size:13px;margin-bottom:24px}
-  .ver{display:inline-block;background:#E8F5E9;color:#1B5E20;border-radius:999px;padding:5px 14px;font-size:12px;font-weight:700;margin-bottom:20px}
-  a.dl{display:inline-block;background:#2E7D32;color:#fff;text-decoration:none;padding:14px 32px;border-radius:12px;font-weight:700;font-size:16px}
-  a.dl:hover{background:#1B5E20}
-  .note{color:#9AAA9F;font-size:11px;margin-top:18px}
-  .size{color:#63746A;font-size:12px;margin-top:8px}
-</style>
-</head>
-<body>
-<div class="card">
-  <h1>🎓 EDUC CI</h1>
-  <div class="sub">Plateforme nationale de gestion éducative<br>Direction Régionale de l'Éducation Nationale, de l'Alphabétisation et de l'Enseignement Technique</div>
-  <div class="ver">APK v1.0.0 · Android 8.0+</div>
-  <a class="dl" href="/${APK_NAME}" download>⬇ Télécharger l'APK</a>
-  <div class="size">~65 KB · application installable</div>
-  <div class="note">Comptes de démonstration : admin/admin123 · dre.adzope/1234 · chef.lycee/1234 · censeur/1234 · ens.math/1234</div>
-</div>
-</body>
-</html>`);
-});
-
-server.listen(PORT, '0.0.0.0', () => {
-  console.log('EDUC CI APK server démarré sur port ' + PORT);
-});
+'use strict';
+const crypto=require('node:crypto');const express=require('express');const path=require('node:path');
+const {connectDatabase,tx}=require('./db');const S=require('./security');
+const PORT=Number(process.env.PORT||8000);const HOUR=3600000;
+const q=(c,sql,params=[])=>c.query(sql,params);
+function safeUser(x){return {id:x.id,login:x.login,full_name:x.full_name,role_key:x.role_key,role_label:x.role_label,organization_id:x.organization_id,region_id:x.region_id,organization_name:x.organization_name,status:x.status}}
+function publicAccount(x){return {id:x.id,login:x.login,full_name:x.full_name,role_key:x.role_key,role_label:x.role_label,organization_id:x.organization_id,organization_name:x.organization_name,region_id:x.region_id,status:x.status,created_at:x.created_at,activated_at:x.activated_at}}
+const errorHandler=(err,req,res,next)=>{if(res.headersSent)return next(err);if(err.status)return res.status(err.status).json({error:err.message});if(err.code==='23505')return res.status(409).json({error:'Identifiant ou code déjà utilisé.'});console.error('Erreur serveur:',err.code||err.name||'unknown');res.status(500).json({error:'Une erreur serveur est survenue. Réessayez plus tard.'})};
+const asyncRoute=fn=>(req,res,next)=>Promise.resolve().then(()=>fn(req,res,next)).catch(next);
+function clientIp(req){return crypto.createHash('sha256').update(req.ip||'inconnu').digest('hex')}
+function audit(c,req,action,type,id,region,details={}){return q(c,'INSERT INTO audit_events(actor_id,action,target_type,target_id,region_id,details,ip_hash) VALUES ($1,$2,$3,$4,$5,$6,$7)',[req.actor?.id||null,action,type,id||null,region||null,JSON.stringify(details),clientIp(req)])}
+function sessionCookie(req,res,value){res.cookie('drenaet_session',value,{httpOnly:true,sameSite:'lax',secure:req.secure,path:'/',maxAge:12*HOUR})}
+async function issueSession(c,req,res,account){const raw=S.token(),csrf=S.token();await q(c,'INSERT INTO sessions(token_hash,account_id,csrf_token,auth_version,expires_at) VALUES ($1,$2,$3,$4,now()+interval \'12 hours\')',[S.hashToken(raw),account.id,csrf,account.auth_version]);sessionCookie(req,res,raw);return csrf}
+async function bootstrap(pool){const row=await q(pool,'SELECT 1 FROM accounts LIMIT 1');if(row.rowCount)return;
+ const login=S.login(process.env.BOOTSTRAP_LOGIN),pwd=S.password(process.env.BOOTSTRAP_PASSWORD),encoded=await S.hashPassword(pwd);
+ await tx(pool,async c=>{await q(c,'LOCK TABLE accounts IN EXCLUSIVE MODE');if((await q(c,'SELECT 1 FROM accounts LIMIT 1')).rowCount)return;const out=await q(c,"INSERT INTO accounts(login,full_name,role_key,status,password_hash) VALUES ($1,'Administrateur général','platform_admin','active',$2) RETURNING id",[login,encoded]);await q(c,"INSERT INTO audit_events(action,target_type,target_id,details) VALUES ('platform.bootstrap','account',$1,'{}')",[out.rows[0].id])})}
+function parseCookie(value){let m=/(?:^|;\s*)drenaet_session=([A-Za-z0-9_-]{30,90})(?:;|$)/.exec(value||'');return m?.[1]||null}
+async function build(){const pool=await connectDatabase(process.env.DATABASE_URL);try{await bootstrap(pool)}catch(e){await pool.end();throw e}
+ const dummyPasswordHash=await S.hashPassword(S.token());
+ const app=express();app.disable('x-powered-by');app.set('trust proxy',1);
+ app.use((req,res,next)=>{const preview=process.env.DRENAET_ALLOW_PREVIEW==='1';res.set({'X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin','Cache-Control':'no-store','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; object-src 'none'"+(preview?'':"; frame-ancestors 'none'")});if(!preview)res.set('X-Frame-Options','DENY');next()});
+ app.use('/api',express.json({limit:'64kb'}));
+ app.use('/api',asyncRoute(async(req,res,next)=>{let raw=parseCookie(req.headers.cookie);if(raw){let result=await q(pool,`SELECT a.*,r.label role_label,o.name organization_name,s.csrf_token,s.token_hash FROM sessions s JOIN accounts a ON a.id=s.account_id JOIN roles r ON r.role_key=a.role_key LEFT JOIN organizations o ON o.id=a.organization_id WHERE s.token_hash=$1 AND s.expires_at>now() AND s.auth_version=a.auth_version AND a.status='active'`,[S.hashToken(raw)]);if(result.rowCount){req.actor=result.rows[0];req.session=result.rows[0]}}
+ if(!['GET','HEAD','OPTIONS'].includes(req.method)){let origin=req.get('origin');if(origin){let allowed=false;try{allowed=new URL(origin).host===req.get('host')}catch{}if(!allowed)S.fail('Origine non autorisée.',403)}if(![undefined,'same-origin','none'].includes(req.get('sec-fetch-site')))S.fail('Origine non autorisée.',403);if(req.session&&!['/auth/login','/auth/activate'].includes(req.path)&&req.get('x-csrf-token')!==req.session.csrf_token)S.fail('Session à actualiser.',403)}
+ return next()}));
+ const auth=(req,res,next)=>req.actor?next():next(Object.assign(new Error('Veuillez vous connecter.'),{status:401}));
+ app.get('/healthz',asyncRoute(async(req,res)=>{await q(pool,'SELECT 1');res.json({status:'ok'})}));
+ app.get('/api/auth/session',asyncRoute((req,res)=>res.json({user:req.actor?safeUser(req.actor):null,csrf:req.session?.csrf_token||null})));
+ async function throttle(c,req,login){const ip=clientIp(req);let n=await q(c,"SELECT count(*)::int count FROM auth_failures WHERE (login=$1 OR ip_hash=$2) AND created_at>now()-interval '15 minutes'",[login,ip]);if(n.rows[0].count>=8)S.fail('Trop de tentatives. Réessayez plus tard.',429);return ip}
+ async function failed(c,login,ip){await q(c,'INSERT INTO auth_failures(login,ip_hash) VALUES ($1,$2)',[login,ip]);await q(c,"DELETE FROM auth_failures WHERE created_at<now()-interval '24 hours'")}
+ app.post('/api/auth/login',asyncRoute(async(req,res)=>{let login=S.login(req.body?.login),pwd=String(req.body?.password||'');let ip=await throttle(pool,req,login);let r=await q(pool,`SELECT a.*,r.label role_label,o.name organization_name FROM accounts a JOIN roles r ON r.role_key=a.role_key LEFT JOIN organizations o ON o.id=a.organization_id WHERE login=$1`,[login]);const user=r.rows[0],passwordOk=await S.verifyPassword(pwd,user?.password_hash||dummyPasswordHash);let ok=!!user&&user.status==='active'&&passwordOk;
+ if(!ok){await failed(pool,login,ip);S.fail('Identifiant ou mot de passe incorrect, ou compte non actif.',401)}
+ const out=await tx(pool,async c=>{const csrf=await issueSession(c,req,res,user);await audit(c,req,'auth.login','account',user.id,user.region_id);await q(c,'DELETE FROM auth_failures WHERE login=$1 AND ip_hash=$2',[login,ip]);return {user:safeUser(user),csrf}});res.json(out)}));
+ app.post('/api/auth/activate',asyncRoute(async(req,res)=>{const login=S.login(req.body?.login),code=String(req.body?.code||''),newPassword=S.password(req.body?.password);if(!/^[A-Za-z0-9_-]{25,50}$/.test(code))S.fail('Code provisoire invalide.',400);let ip=await throttle(pool,req,login);
+ const user=await q(pool,'SELECT * FROM accounts WHERE login=$1',[login]);const account=user.rows[0];if(!account||account.status!=='invited'||!account.invitation_hash||account.invitation_hash!==S.hashToken(code)||new Date(account.invitation_expires_at)<=new Date()){await failed(pool,login,ip);S.fail('Code provisoire invalide ou expiré.',403)}
+ const encoded=await S.hashPassword(newPassword);const out=await tx(pool,async c=>{let updated=await q(c,`UPDATE accounts SET status='active',password_hash=$1,invitation_hash=NULL,invitation_expires_at=NULL,activated_at=now(),updated_at=now(),auth_version=auth_version+1 WHERE id=$2 AND status='invited' AND invitation_hash=$3 AND invitation_expires_at>now() RETURNING *`,[encoded,account.id,S.hashToken(code)]);if(!updated.rowCount)S.fail('Code provisoire déjà utilisé ou expiré.',409);const a=updated.rows[0];const csrf=await issueSession(c,req,res,a);await audit(c,req,'auth.activate','account',a.id,a.region_id);return {user:safeUser({...a,role_label:(await q(c,'SELECT label FROM roles WHERE role_key=$1',[a.role_key])).rows[0].label,organization_name:(await q(c,'SELECT name FROM organizations WHERE id=$1',[a.organization_id])).rows[0]?.name}),csrf}});res.json(out)}));
+ app.post('/api/auth/logout',auth,asyncRoute(async(req,res)=>{await q(pool,'DELETE FROM sessions WHERE token_hash=$1',[req.session.token_hash]);res.clearCookie('drenaet_session',{httpOnly:true,sameSite:'lax',secure:req.secure,path:'/'});res.json({ok:true})}));
+ app.get('/api/profile',auth,asyncRoute((req,res)=>res.json({user:safeUser(req.actor)})));
+ app.post('/api/profile/password',auth,asyncRoute(async(req,res)=>{if(!await S.verifyPassword(req.body?.currentPassword,req.actor.password_hash))S.fail('Mot de passe actuel incorrect.',403);let passwordHash=await S.hashPassword(S.password(req.body?.newPassword));const result=await tx(pool,async c=>{let a=(await q(c,'UPDATE accounts SET password_hash=$1,auth_version=auth_version+1,updated_at=now() WHERE id=$2 RETURNING *',[passwordHash,req.actor.id])).rows[0];await q(c,'DELETE FROM sessions WHERE account_id=$1',[a.id]);const csrf=await issueSession(c,req,res,a);await audit(c,req,'account.password.change','account',a.id,a.region_id);return {ok:true,csrf}});res.json(result)}));
+ app.get('/api/roles',auth,asyncRoute(async(req,res)=>{let r=await q(pool,'SELECT role_key,label,scope FROM roles ORDER BY rank DESC,role_key');res.json({items:r.rows.filter(x=>x.role_key===req.actor.role_key||req.actor.role_key==='platform_admin'&&x.role_key!=='platform_admin'||req.actor.role_key==='regional_director'&&x.role_key!=='platform_admin'&&x.role_key!=='regional_director'||req.actor.role_key==='school_head'&&S.SCHOOL_SUBORDINATES.has(x.role_key))})}));
+ app.patch('/api/roles/:role/label',auth,asyncRoute(async(req,res)=>{if(req.actor.role_key!=='platform_admin')S.fail('Réservé à l’administration générale.',403);const label=S.label(req.body?.label,'Intitulé du rôle',100);if(req.params.role==='platform_admin')S.fail('Le rôle administrateur général reste fixe.',403);const out=await tx(pool,async c=>{let r=await q(c,'UPDATE roles SET label=$1 WHERE role_key=$2 RETURNING role_key,label,scope',[label,req.params.role]);if(!r.rowCount)S.fail('Rôle introuvable.',404);await audit(c,req,'role.label','role',null,null,{role:req.params.role,label});return r.rows[0]});res.json(out)}));
+ app.get('/api/organizations',auth,asyncRoute(async(req,res)=>{const a=req.actor;let sql='SELECT id,kind,code,name,region_id,status FROM organizations',params=[];
+ if(a.role_key==='platform_admin')sql+=' ORDER BY kind,name,id LIMIT 300';else if(a.role_key==='regional_director'){sql+=' WHERE id=$1 OR region_id=$1 ORDER BY kind,name,id LIMIT 300';params=[a.region_id]}else{sql+=' WHERE id=$1 OR id=$2 ORDER BY kind,name,id';params=[a.region_id,a.organization_id]}
+ res.json({items:(await q(pool,sql,params)).rows})}));
+ app.post('/api/organizations/regions',auth,asyncRoute(async(req,res)=>{if(req.actor.role_key!=='platform_admin')S.fail('Réservé à l’administration générale.',403);let code=S.label(req.body?.code,'Code',30).toUpperCase(),name=S.label(req.body?.name,'DRENAET');if(!/^[A-Z0-9_-]{2,30}$/.test(code))S.fail('Code invalide.');let region=await tx(pool,async c=>{let r=(await q(c,"INSERT INTO organizations(kind,code,name) VALUES ('region',$1,$2) RETURNING id,kind,code,name",[code,name])).rows[0];await audit(c,req,'organization.create','organization',r.id,r.id,{kind:'region'});return r});res.status(201).json(region)}));
+ app.post('/api/organizations/units',auth,asyncRoute(async(req,res)=>{const actor=req.actor;if(!['platform_admin','regional_director'].includes(actor.role_key))S.fail('Réservé à la direction.',403);const kind=req.body?.kind;if(!['school','service'].includes(kind))S.fail('Type d’unité invalide.');const code=S.label(req.body?.code,'Code',30).toUpperCase(),name=S.label(req.body?.name,'Nom',160),regionId=actor.role_key==='platform_admin'?Number(req.body?.region_id):Number(actor.region_id);if(!/^[A-Z0-9_-]{2,30}$/.test(code)||!Number.isSafeInteger(regionId))S.fail('Code ou région invalide.');let out=await tx(pool,async c=>{let region=await q(c,"SELECT id FROM organizations WHERE id=$1 AND kind='region' AND status='active' FOR UPDATE",[regionId]);if(!region.rowCount)S.fail('Direction régionale introuvable.',404);let r=(await q(c,'INSERT INTO organizations(kind,code,name,region_id) VALUES ($1,$2,$3,$4) RETURNING id,kind,code,name,region_id',[kind,code,name,regionId])).rows[0];await audit(c,req,'organization.create','organization',r.id,regionId,{kind});return r});res.status(201).json(out)}));
+ app.get('/api/dashboard',auth,asyncRoute(async(req,res)=>{const a=req.actor;let filter=a.role_key==='platform_admin'?'TRUE':a.role_key==='regional_director'?'region_id=$1':'organization_id=$1',param=a.role_key==='platform_admin'?[]:[a.role_key==='regional_director'?a.region_id:a.organization_id];let staff=await q(pool,`SELECT count(*)::int count FROM accounts WHERE ${filter}` ,param);let orgFilter=a.role_key==='platform_admin'?'TRUE':a.role_key==='regional_director'?'region_id=$1':'id=$1',count=await q(pool,`SELECT count(*) FILTER (WHERE kind='school')::int schools,count(*) FILTER (WHERE kind='region')::int regions FROM organizations WHERE ${orgFilter}`,param);res.json({name:a.full_name,role:a.role_label,scope:a.organization_name||'Administration générale',accounts:staff.rows[0].count,schools:count.rows[0].schools,regions:count.rows[0].regions,phase:'Identité, structure et accès sécurisés'})}));
+ app.get('/api/accounts',auth,asyncRoute(async(req,res)=>{const a=req.actor;if(!S.canList(a))S.fail('Liste réservée aux responsables autorisés.',403);let where=a.role_key==='platform_admin'?'TRUE':a.role_key==='regional_director'?'a.region_id=$1':'a.organization_id=$1',param=a.role_key==='platform_admin'?[]:[a.role_key==='regional_director'?a.region_id:a.organization_id];let cursor=Number(req.query.after||0);if(!Number.isSafeInteger(cursor)||cursor<0)S.fail('Curseur invalide.');param.push(cursor);let r=await q(pool,`SELECT a.id,a.login,a.full_name,a.role_key,r.label role_label,a.organization_id,o.name organization_name,a.region_id,a.status,a.created_at,a.activated_at FROM accounts a JOIN roles r ON r.role_key=a.role_key LEFT JOIN organizations o ON o.id=a.organization_id WHERE ${where} AND a.id>$${param.length} ORDER BY a.id LIMIT 101`,param);res.json({items:r.rows.slice(0,100).map(publicAccount),next_after:r.rows.length>100?r.rows[99].id:null})}));
+ async function loadOrganization(c,id){let org=await q(c,'SELECT id,kind,region_id,status FROM organizations WHERE id=$1 FOR UPDATE',[id]);if(!org.rowCount||org.rows[0].status!=='active')S.fail('Unité active introuvable.',404);return org.rows[0]}
+ app.post('/api/accounts',auth,asyncRoute(async(req,res)=>{const actor=req.actor,login=S.login(req.body?.login),name=S.label(req.body?.full_name,'Nom et prénoms'),role=req.body?.role_key,unitId=Number(req.body?.organization_id);if(!Number.isSafeInteger(unitId))S.fail('Unité invalide.');const code=S.token(),expires=new Date(Date.now()+7*24*HOUR).toISOString();const out=await tx(pool,async c=>{const org=await loadOrganization(c,unitId);if(!S.canAssign(actor,role,org))S.fail('Attribution hors de votre périmètre.',403);const region=org.kind==='region'?org.id:org.region_id;let r=(await q(c,"INSERT INTO accounts(login,full_name,role_key,organization_id,region_id,status,invitation_hash,invitation_expires_at,created_by) VALUES ($1,$2,$3,$4,$5,'invited',$6,$7,$8) RETURNING id,login,full_name,role_key,organization_id,region_id,status",[login,name,role,unitId,region,S.hashToken(code),expires,actor.id])).rows[0];await audit(c,req,'account.invite','account',r.id,region,{role,organization_id:unitId});return {account:r,temporary_code:code,expires_at:expires}});res.status(201).json(out)}));
+ async function lockedTarget(c,actor,id){const found=await q(c,'SELECT * FROM accounts WHERE id=$1 FOR UPDATE',[id]);if(!found.rowCount)S.fail('Compte introuvable.',404);const target=found.rows[0];if(!S.canManage(actor,target))S.fail('Compte hors de votre périmètre.',403);return target}
+ app.patch('/api/accounts/:id/status',auth,asyncRoute(async(req,res)=>{const id=Number(req.params.id),status=req.body?.status;if(!Number.isSafeInteger(id)||!['active','suspended'].includes(status))S.fail('État invalide.');const result=await tx(pool,async c=>{let target=await lockedTarget(c,req.actor,id);if(status==='active'&&!target.password_hash)S.fail('Première activation avec code requise.',409);let r=(await q(c,'UPDATE accounts SET status=$1,auth_version=auth_version+1,updated_at=now() WHERE id=$2 RETURNING id,status',[status,id])).rows[0];await q(c,'DELETE FROM sessions WHERE account_id=$1',[id]);await audit(c,req,'account.status','account',id,target.region_id,{from:target.status,to:status});return r});res.json(result)}));
+ app.patch('/api/accounts/:id/assignment',auth,asyncRoute(async(req,res)=>{const id=Number(req.params.id),role=req.body?.role_key,unitId=Number(req.body?.organization_id);if(!Number.isSafeInteger(id)||!Number.isSafeInteger(unitId))S.fail('Compte ou unité invalide.');const result=await tx(pool,async c=>{const target=await lockedTarget(c,req.actor,id),org=await loadOrganization(c,unitId);if(!S.canAssign(req.actor,role,org))S.fail('Rôle ou unité hors périmètre.',403);const region=org.kind==='region'?org.id:org.region_id;let r=(await q(c,'UPDATE accounts SET role_key=$1,organization_id=$2,region_id=$3,auth_version=auth_version+1,updated_at=now() WHERE id=$4 RETURNING id,role_key,organization_id,region_id',[role,unitId,region,id])).rows[0];await q(c,'DELETE FROM sessions WHERE account_id=$1',[id]);await audit(c,req,'account.assignment','account',id,region,{from_role:target.role_key,from_unit:target.organization_id,role,unit:unitId});return r});res.json(result)}));
+ app.post('/api/accounts/:id/reset',auth,asyncRoute(async(req,res)=>{const id=Number(req.params.id);if(!Number.isSafeInteger(id))S.fail('Compte invalide.');const code=S.token(),expires=new Date(Date.now()+7*24*HOUR).toISOString();let result=await tx(pool,async c=>{let target=await lockedTarget(c,req.actor,id);let r=(await q(c,"UPDATE accounts SET status='invited',password_hash=NULL,invitation_hash=$1,invitation_expires_at=$2,auth_version=auth_version+1,updated_at=now() WHERE id=$3 RETURNING id,status",[S.hashToken(code),expires,id])).rows[0];await q(c,'DELETE FROM sessions WHERE account_id=$1',[id]);await audit(c,req,'account.access.reset','account',id,target.region_id);return {account:r,temporary_code:code,expires_at:expires}});res.json(result)}));
+ app.get('/api/audit',auth,asyncRoute(async(req,res)=>{let a=req.actor;if(!['platform_admin','regional_director'].includes(a.role_key))S.fail('Journal réservé à la direction.',403);let region=a.role_key==='platform_admin'?null:a.region_id;let rows=await q(pool,'SELECT id,actor_id,action,target_type,target_id,region_id,details,created_at FROM audit_events WHERE ($1::bigint IS NULL OR region_id=$1) ORDER BY id DESC LIMIT 100',[region]);res.json({items:rows.rows})}));
+ const web=path.join(__dirname,'web');app.get('/',(req,res)=>res.sendFile(path.join(web,'index.html')));app.get(['/app.js','/app.css'],(req,res)=>res.sendFile(path.join(web,req.path.slice(1))));
+ app.use('/api',(req,res)=>res.status(404).json({error:'Ressource introuvable.'}));app.use(errorHandler);
+ return {app,pool}
+}
+if(require.main===module){build().then(({app})=>app.listen(PORT,'0.0.0.0',()=>console.log('DRENAET CI — étape 1 : serveur prêt sur le port '+PORT))).catch(e=>{console.error('Démarrage refusé :',e.message);process.exitCode=1})}
+module.exports={build};
