@@ -2,6 +2,9 @@
 const fs=require('node:fs');const path=require('node:path');const {Pool}=require('pg');
 async function connectDatabase(url){
  if(!url||!/^postgres(?:ql)?:\/\//.test(url))throw Error('DATABASE_URL PostgreSQL est nécessaire (sa valeur doit rester privée).');
+ let host;try{host=new URL(url).hostname}catch{throw Error('DATABASE_URL PostgreSQL invalide. Ne publiez pas sa valeur.')}
+ // Neon PgBouncer (transaction pooling) rejects our session search_path and is unsuitable for migrations.
+ if(host.split('.')[0].endsWith('-pooler'))throw Error('Utilisez une connexion PostgreSQL DIRECTE non poolée pour ce Web Service et ses migrations ; configurez-la uniquement dans Render après rotation du secret.');
  const bootstrap=new Pool({connectionString:url,max:1});
  try{await bootstrap.query('CREATE SCHEMA IF NOT EXISTS drenaet_ci')}finally{await bootstrap.end()}
  // Keep this application's tables apart from any pre-existing database content.

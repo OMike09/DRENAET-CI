@@ -21,4 +21,14 @@ function canAssign(actor,role,org){if(!actor||!org||ROLE_SCOPE[role]!==org.kind|
  if(actor.role_key===REGIONAL)return role!==REGIONAL;
  return actor.role_key===SCHOOL&&String(actor.organization_id)===String(org.id)&&SCHOOL_SUBORDINATES.has(role)}
 function canList(actor){return !!actor&&[ROOT,REGIONAL,SCHOOL].includes(actor.role_key)}
-module.exports={ROLE_SCOPE,SCHOOL_SUBORDINATES,fail,login,label,password,token,hashToken,hashPassword,verifyPassword,canAssign,canManage,canList};
+// An order is not account administration: only the explicitly defined reporting lines may issue one.
+const REGIONAL_REPORTS=new Set(['regional_secretariat','regional_staff','inspector','school_head','service_manager']);
+const DEPUTY_REPORTS=new Set(['coordinator','educator','teacher','school_staff']);
+function canDirect(actor,target){if(!actor||!target||actor.status!=='active'||target.status!=='active'||String(actor.id)===String(target.id))return false;
+ if(actor.role_key===ROOT)return target.role_key===REGIONAL;
+ if(actor.role_key===REGIONAL)return String(actor.region_id)===String(target.region_id)&&REGIONAL_REPORTS.has(target.role_key);
+ if(actor.role_key===SCHOOL)return String(actor.organization_id)===String(target.organization_id)&&SCHOOL_SUBORDINATES.has(target.role_key);
+ if(actor.role_key==='school_deputy')return String(actor.organization_id)===String(target.organization_id)&&DEPUTY_REPORTS.has(target.role_key);
+ return false}
+function canIssue(actor){return !!actor&&[ROOT,REGIONAL,SCHOOL,'school_deputy'].includes(actor.role_key)}
+module.exports={ROLE_SCOPE,SCHOOL_SUBORDINATES,fail,login,label,password,token,hashToken,hashPassword,verifyPassword,canAssign,canManage,canList,canDirect,canIssue};

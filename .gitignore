@@ -1,4 +1,5 @@
 node_modules/
+.local-test-credentials
 .env
 .env.*
 !.env.example
