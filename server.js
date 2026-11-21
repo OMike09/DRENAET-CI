@@ -5,7 +5,7 @@ const PORT=Number(process.env.PORT||8000);const HOUR=3600000;
 const q=(c,sql,params=[])=>c.query(sql,params);
 function safeUser(x){return {id:x.id,login:x.login,full_name:x.full_name,role_key:x.role_key,role_label:x.role_label,organization_id:x.organization_id,region_id:x.region_id,organization_name:x.organization_name,status:x.status}}
 function publicAccount(x){return {id:x.id,login:x.login,full_name:x.full_name,role_key:x.role_key,role_label:x.role_label,organization_id:x.organization_id,organization_name:x.organization_name,region_id:x.region_id,status:x.status,created_at:x.created_at,activated_at:x.activated_at}}
-const errorHandler=(err,req,res,next)=>{if(res.headersSent)return next(err);if(err.status)return res.status(err.status).json({error:err.message});if(err.code==='23505')return res.status(409).json({error:'Identifiant ou code déjà utilisé.'});console.error('Erreur serveur:',err.code||err.name||'unknown');res.status(500).json({error:'Une erreur serveur est survenue. Réessayez plus tard.'})};
+const errorHandler=(err,req,res,next)=>{if(res.headersSent)return next(err);if(err.status&&err.type==='entity.too.large')return res.status(413).json({error:'Requête trop volumineuse : fichier limité à 2 Mio.'});if(err.type==='entity.parse.failed')return res.status(400).json({error:'Données JSON invalides.'});if(err.status)return res.status(err.status).json({error:err.message});if(err.code==='23505')return res.status(409).json({error:'Identifiant ou code déjà utilisé.'});console.error('Erreur serveur:',err.code||err.name||'unknown');res.status(500).json({error:'Une erreur serveur est survenue. Réessayez plus tard.'})};
 const asyncRoute=fn=>(req,res,next)=>Promise.resolve().then(()=>fn(req,res,next)).catch(next);
 function clientIp(req){return crypto.createHash('sha256').update(req.ip||'inconnu').digest('hex')}
 function audit(c,req,action,type,id,region,details={}){return q(c,'INSERT INTO audit_events(actor_id,action,target_type,target_id,region_id,details,ip_hash) VALUES ($1,$2,$3,$4,$5,$6,$7)',[req.actor?.id||null,action,type,id||null,region||null,JSON.stringify(details),clientIp(req)])}
@@ -19,6 +19,7 @@ async function build(){const pool=await connectDatabase(process.env.DATABASE_URL
  const dummyPasswordHash=await S.hashPassword(S.token());
  const app=express();app.disable('x-powered-by');app.set('trust proxy',1);
  app.use((req,res,next)=>{const preview=process.env.DRENAET_ALLOW_PREVIEW==='1';res.set({'X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin','Cache-Control':'no-store','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; object-src 'none'"+(preview?'':"; frame-ancestors 'none'")});if(!preview)res.set('X-Frame-Options','DENY');next()});
+ app.use('/api/library/documents',express.json({limit:'3mb'})); // 2 Mio binaires encodés en base64.
  app.use('/api',express.json({limit:'64kb'}));
  app.use('/api',asyncRoute(async(req,res,next)=>{let raw=parseCookie(req.headers.cookie);if(raw){let result=await q(pool,`SELECT a.*,r.label role_label,o.name organization_name,s.csrf_token,s.token_hash FROM sessions s JOIN accounts a ON a.id=s.account_id JOIN roles r ON r.role_key=a.role_key LEFT JOIN organizations o ON o.id=a.organization_id WHERE s.token_hash=$1 AND s.expires_at>now() AND s.auth_version=a.auth_version AND a.status='active'`,[S.hashToken(raw)]);if(result.rowCount){req.actor=result.rows[0];req.session=result.rows[0]}}
  if(!['GET','HEAD','OPTIONS'].includes(req.method)){let origin=req.get('origin');if(origin){let allowed=false;try{allowed=new URL(origin).host===req.get('host')}catch{}if(!allowed)S.fail('Origine non autorisée.',403)}if(![undefined,'same-origin','none'].includes(req.get('sec-fetch-site')))S.fail('Origine non autorisée.',403);if(req.session&&!['/auth/login','/auth/activate'].includes(req.path)&&req.get('x-csrf-token')!==req.session.csrf_token)S.fail('Session à actualiser.',403)}
@@ -55,7 +56,8 @@ async function build(){const pool=await connectDatabase(process.env.DATABASE_URL
  app.get('/api/audit',auth,asyncRoute(async(req,res)=>{let a=req.actor;if(!['platform_admin','regional_director'].includes(a.role_key))S.fail('Journal réservé à la direction.',403);let region=a.role_key==='platform_admin'?null:a.region_id;let rows=await q(pool,'SELECT id,actor_id,action,target_type,target_id,region_id,details,created_at FROM audit_events WHERE ($1::bigint IS NULL OR region_id=$1) ORDER BY id DESC LIMIT 100',[region]);res.json({items:rows.rows})}));
  require('./workflows')({app,pool,auth,asyncRoute,audit});
  require('./coordination')({app,pool,auth,asyncRoute,audit});
- const web=path.join(__dirname,'web');app.get('/',(req,res)=>res.sendFile(path.join(web,'index.html')));app.get(['/app.js','/app.css','/work-ui.js','/coord-ui.js'],(req,res)=>res.sendFile(path.join(web,req.path.slice(1))));
+ require('./resources')({app,pool,auth,asyncRoute,audit});
+ const web=path.join(__dirname,'web');app.get('/',(req,res)=>res.sendFile(path.join(web,'index.html')));app.get(['/app.js','/app.css','/work-ui.js','/coord-ui.js','/resource-ui.js'],(req,res)=>res.sendFile(path.join(web,req.path.slice(1))));
  app.use('/api',(req,res)=>res.status(404).json({error:'Ressource introuvable.'}));app.use(errorHandler);
  return {app,pool}
 }

@@ -1,8 +1,8 @@
 {
   "name": "drenaet-ci",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
-  "description": "DRENAET CI — étapes 1–3 : comptes, instructions, missions, messages et rapports",  
+  "description": "DRENAET CI — étapes 1–4 : coordination, rapports, bibliothèque privée et calendrier",   
   "engines": {"node": ">=20"},
   "scripts": {"start": "node server.js", "test": "node --test tests/*.test.js"},
   "dependencies": {"express": "^4.21.2", "pg": "^8.16.3"},
