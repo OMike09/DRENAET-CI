@@ -1,10 +1,10 @@
 {
   "name": "drenaet-ci",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
-  "description": "DRENAET CI — étapes 1–4 : coordination, rapports, bibliothèque privée et calendrier",   
+  "description": "DRENAET CI — étapes 1–5 : activité statistique et notifications internes ciblées",    
   "engines": {"node": ">=20"},
-  "scripts": {"start": "node server.js", "test": "node --test tests/*.test.js"},
+  "scripts": {"start": "node server.js", "test": "node --test --test-concurrency=1 tests/*.test.js"},
   "dependencies": {"express": "^4.21.2", "pg": "^8.16.3"},
   "devDependencies": {"playwright": "^1.65.1"}
 }

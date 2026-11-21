@@ -1,33 +1,34 @@
-# DRENAET CI — étapes 1–4
+# DRENAET CI — étapes 1–5
 
-Application web institutionnelle séparée de l'ancien essai APK. Étapes 1–3 : comptes et hiérarchie, instructions, missions, messagerie privée et rapports à circuits configurables. **Étape 4 : bibliothèque documentaire privée et calendrier cloisonné**. Pas de comptes élèves ou parents en v1.
+Application web institutionnelle distincte de l'ancien essai APK. Étapes 1–4 : comptes et hiérarchie, instructions, missions, messagerie privée, rapports à circuits configurables, bibliothèque privée et calendrier. **Étape 5 : indicateurs d'activité vérifiables et notifications internes ciblées.** Aucun compte élève ou parent en v1.
 
-**Statut : étape 4 testée localement sur PostgreSQL et Chromium (ordinateur et largeur mobile simulée), mais non déployée par l'agent sur Render.** L'application des étapes 1–3 et `/healthz` ont répondu publiquement lors du contrôle ; nous n'avons pas accès aux comptes privés, à la base Neon, aux sauvegardes ni aux journaux du déploiement de cette étape. Voir [ETAPE_4_BIBLIOTHEQUE_CALENDRIER.md](ETAPE_4_BIBLIOTHEQUE_CALENDRIER.md).
+**Statut : étape 5 testée localement avec PostgreSQL et Chromium, mais non déployée par l'agent sur Render.** La page publique des étapes 1–3 et `/healthz` répondaient au dernier contrôle ; l'étape 4 n'était pas encore visible dans le dépôt public à ce moment. Aucun accès à Neon, aux comptes privés ni aux sauvegardes de production n'a été effectué. Voir [ETAPE_5_STATISTIQUES_NOTIFICATIONS.md](ETAPE_5_STATISTIQUES_NOTIFICATIONS.md).
 
-## Fonctions disponibles dans les sources
+## Fonctions vérifiées dans les sources
 
-- Sessions HTTP-only, CSRF, comptes nominatifs activés par code à usage unique, rôles et affectations contrôlés côté serveur ; suspension et audit. Administrateur général distinct des directeurs régionaux ; aucune inscription publique.
-- Instructions et missions hiérarchiques, échéances et décisions tracées ; alertes **internes** ciblées.
-- Messagerie privée 1 à 1 distincte des instructions, avec lecture réservée aux participants et statut d'ouverture enregistré après affichage réel. Rapports textuels à circuits ordonnés configurés par l'administration centrale et les directions régionales ; versions et décisions conservées.
-- Bibliothèque : PDF, PNG ou JPEG de **2 Mio au plus**, déposés dans PostgreSQL et servis uniquement après authentification et contrôle de visibilité. Documents privés à l'auteur ; publication à l'établissement par chef/adjoint, à la région par directeur régional ou générale par administrateur. Téléchargement forcé, archivage non destructif et audit.
-- Calendrier : événements privés, établissement, région ou généraux avec les mêmes pouvoirs de publication ; affichage par mois, modifications versionnées, annulation non destructrice, contrôle de conflit et historique consultable par les personnels autorisés.
-- Schéma isolé `drenaet_ci`, migrations transactionnelles additives 001 à 004 ; autres schémas et sources non importés ni supprimés.
+- Comptes nominatifs, sessions HTTP-only, CSRF, affectations et rôle contrôlés côté serveur, suspension, audit. Administrateur général séparé des directeurs régionaux.
+- Instructions et missions traçables et alertes internes propres à leurs événements.
+- Messages privés entre personnes autorisées et rapports à circuits hiérarchiques configurables, versions et décisions conservées.
+- Bibliothèque PDF/PNG/JPEG (2 Mio par fichier, dans PostgreSQL) privée, établissement, région ou générale selon l'autorité de l'auteur ; calendrier à visibilité équivalente, modifications historisées et annulations non destructrices.
+- Nouvelle page Statistiques : comptes et établissements actifs, instructions, missions, rapports, documents **accessibles** et événements à venir. Filtres de 30/90/365 jours pour les activités datées ; vue globale pour l'administrateur, vue régionale pour un directeur, vue des éléments accessibles à titre individuel pour les autres. Aucun contenu privé, nom de personne ou résultat d'élève n'est exposé par ces agrégats.
+- Rubrique Notifications unifiée : alertes des instructions/missions existantes, ainsi que nouveaux messages, étapes de rapports, publications documentaires et événements d'agenda. Création **dans les mêmes transactions que les opérations réussies**, ciblage par rôle/région/établissement, clé de déduplication par événement, filtre des documents archivés ou devenus inaccessibles. Consultation de la liste **sans marquer Ouvert** ; ouverture du contenu puis confirmation côté serveur. Compteur et états persistants.
+- PostgreSQL obligatoire, schéma isolé `drenaet_ci`, migrations versionnées 001 à 005. Les données antérieures restent présentes ; aucune migration d'APK ni effacement automatique.
 
-**Limites explicites :** pas de pièces jointes aux messages/rapports, pas de formats Office dans la bibliothèque de ce lot, pas d'antivirus ni de prévisualisation intégrée des PDF, pas de rappels automatiques, invitations d'agenda, push système ou synchronisation externe. Statistiques métiers à développer. Les dates du calendrier sont saisies dans le fuseau horaire du navigateur puis stockées en `timestamptz` PostgreSQL. Surveiller la capacité de stockage de PostgreSQL avant de généraliser l'usage des fichiers.
+**Limites :** aucune donnée d'élèves/notes en v1, donc pas d'indicateurs pédagogiques de résultats sans source et définition validées. Aucun push téléphone, son système, courriel, rappel automatique, pièce jointe aux messages/rapports ni prévisualisation/antivirus des fichiers. Les notifications d'activité ne sont pas générées rétroactivement pour d'anciens événements ; les anciennes notifications d'instruction/mission sont conservées. L'étape suivante éventuelle sur le push requiert gestion privée de clés VAPID, consentement, abonnements et essais réels sur plateformes avant toute affirmation de fonctionnement.
 
-## Installer le delta 4 sur l'application déjà en place
+## Appliquer ce delta après le colis 4
 
-L'archive de l'étape 4 contient **seulement les fichiers modifiés ou ajoutés par rapport au colis 3**. Décompresser et reporter ces fichiers aux mêmes chemins dans le dépôt existant : **ne pas téléverser le ZIP tel quel** ni remplacer le projet entier. Node.js >=20, `npm install`, `npm start`.
+Le colis 5 contient **uniquement les fichiers ajoutés/modifiés par rapport au colis 4**. Il ne fonctionne pas seul. Décompresser, copier en gardant les chemins du dépôt, sans supprimer les autres fichiers et sans téléverser le ZIP lui-même comme code source. Node.js >=20 : `npm install`, `npm start`.
 
-`DATABASE_URL` est configurée **en privé** dans Render et doit être une URL PostgreSQL **directe, non poolée**, sans hôte Neon `-pooler` : les migrations au démarrage et le `search_path` exigent la session directe. Ne communiquez pas cette valeur ; n'inscrivez aucun secret dans GitHub ou dans le colis. `BOOTSTRAP_LOGIN` et `BOOTSTRAP_PASSWORD` ne servent qu'à l'initialisation si aucun compte n'existe ; ils ne réinitialisent jamais un administrateur déjà créé. `PORT` est fourni par Render. **Ne pas activer `DRENAET_ALLOW_PREVIEW=1` en production.**
+La migration 005 est exécutée automatiquement au démarrage. **Appliquer d'abord le colis 4**, vérifier l'inventaire, la sauvegarde/restauration et la base ciblée ; ne pas exposer `DATABASE_URL`. La connexion PostgreSQL Render doit rester **directe non poolée**, sans `-pooler` Neon. `BOOTSTRAP_LOGIN` et `BOOTSTRAP_PASSWORD` ne sont utiles qu'au premier compte : ils ne doivent pas être partagés ni ajoutés à GitHub. `PORT` est fourni par Render ; ne pas activer `DRENAET_ALLOW_PREVIEW=1` en production.
 
-La migration 004 s'exécute **automatiquement au premier démarrage** du code. Avant un déploiement, vérifier la version actuelle, la base cible, son inventaire et une sauvegarde/restauration vérifiée. Un essai local de migration **003→004 avec messages et rapports préexistants** a réussi ; cela **ne prouve pas** le résultat sur Neon. Après mise en ligne : vérifier les logs et `/healthz`, la reconnexion, les périmètres de deux directions, un dépôt/téléchargement PDF privé et un événement créé/modifié/annulé avec des comptes de test autorisés. Ne pas envoyer de fichiers sensibles réels tant que ces contrôles n'ont pas été réalisés.
+Après mise en ligne : logs et `/healthz`, connexion/reconnexion, deux directions distinctes, message/rapport/document/agenda et destinataires d'alertes avec comptes de test autorisés ; vérifier qu'une liste seule ne marque rien « Ouvert ». Aucune de ces vérifications distantes n'a été faite par l'agent pour ce colis.
 
-Tests sur une base PostgreSQL **locale éphémère**, jamais sur la production :
+Tests **locaux uniquement**, avec rôle SQL pouvant créer et détruire des bases temporaires :
 
 ```text
 npm test
 AC_RUN_BROWSER_TESTS=1 TEST_DATABASE_URL=postgres://<base-locale-de-test> npm test
 ```
 
-La suite sans URL de test ignore les tests PostgreSQL/Chromium. Chromium nécessite `npx playwright install --with-deps chromium`. Se reporter aux documents des étapes 1–3 pour les fonctionnalités et limites antérieures.
+Sans URL locale, les tests PostgreSQL/Chromium sont ignorés ; Chromium nécessite `npx playwright install --with-deps chromium`. **Ne jamais** définir `TEST_DATABASE_URL` sur la base de production. Voir les documents ETAPE_1 à ETAPE_4 pour le périmètre des colis précédents.
