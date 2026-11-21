@@ -56,13 +56,15 @@ async function build(options={}){const pool=await connectDatabase(process.env.DA
  app.get('/api/audit',auth,asyncRoute(async(req,res)=>{let a=req.actor;if(!['platform_admin','regional_director'].includes(a.role_key))S.fail('Journal réservé à la direction.',403);let region=a.role_key==='platform_admin'?null:a.region_id;let rows=await q(pool,'SELECT id,actor_id,action,target_type,target_id,region_id,details,created_at FROM audit_events WHERE ($1::bigint IS NULL OR region_id=$1) ORDER BY id DESC LIMIT 100',[region]);res.json({items:rows.rows})}));
  let push;try{push=require('./push')({app,pool,auth,asyncRoute,audit,pushSender:options.pushSender});await push.cleanup()}catch(e){await pool.end();throw e}
  require('./attachments')({app,pool,auth,asyncRoute,audit});
- const activity=require('./activity')({app,pool,auth,asyncRoute,audit});
+ let reminders;const activity=require('./activity')({app,pool,auth,asyncRoute,audit,beforeNotifications:actor=>reminders?.runFor(actor)});
+ reminders=require('./reminders-exports')({app,pool,auth,asyncRoute,audit,notify:activity.notify,computeOverview:activity.computeOverview});
  require('./workflows')({app,pool,auth,asyncRoute,audit});
  require('./coordination')({app,pool,auth,asyncRoute,audit,notify:activity.notify});
+ require('./correspondence-groups')({app,pool,auth,asyncRoute,audit,notify:activity.notify});
  require('./resources')({app,pool,auth,asyncRoute,audit,notifyAudience:activity.audience});
- const web=path.join(__dirname,'web');app.get('/',(req,res)=>res.sendFile(path.join(web,'index.html')));app.get(['/app.js','/app.css','/work-ui.js','/coord-ui.js','/resource-ui.js','/insights-ui.js','/push-ui.js','/attachments-ui.js','/sw.js','/manifest.webmanifest','/icon-192.png','/icon-512.png'],(req,res)=>res.sendFile(path.join(web,req.path.slice(1))));
+ const web=path.join(__dirname,'web');app.get('/',(req,res)=>res.sendFile(path.join(web,'index.html')));app.get(['/app.js','/app.css','/work-ui.js','/coord-ui.js','/resource-ui.js','/insights-ui.js','/push-ui.js','/attachments-ui.js','/collaboration-ui.js','/reminders-exports-ui.js','/sw.js','/manifest.webmanifest','/icon-192.png','/icon-512.png'],(req,res)=>res.sendFile(path.join(web,req.path.slice(1))));
  app.use('/api',(req,res)=>res.status(404).json({error:'Ressource introuvable.'}));app.use(errorHandler);
- return {app,pool,push}
+ return {app,pool,push,reminders}
 }
-if(require.main===module){build().then(({app,push})=>app.listen(PORT,'0.0.0.0',()=>{push.start();console.log('DRENAET CI — étapes 1–6 : serveur prêt sur le port '+PORT)})).catch(e=>{console.error('Démarrage refusé :',e.message);process.exitCode=1})}
+if(require.main===module){build().then(({app,push,reminders})=>app.listen(PORT,'0.0.0.0',()=>{reminders.start();push.start();console.log('DRENAET CI — étapes 1–9 : serveur prêt sur le port '+PORT)})).catch(e=>{console.error('Démarrage refusé :',e.message);process.exitCode=1})}
 module.exports={build};
