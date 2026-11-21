@@ -61,11 +61,12 @@ async function build(options={}){const pool=await connectDatabase(process.env.DA
  require('./workflows')({app,pool,auth,asyncRoute,audit});
  require('./coordination')({app,pool,auth,asyncRoute,audit,notify:activity.notify});
  require('./correspondence-groups')({app,pool,auth,asyncRoute,audit,notify:activity.notify});
+ const courier=require('./courier')({app,pool,auth,asyncRoute,audit,notify:activity.notify,sender:options.courierSender});
  require('./resources')({app,pool,auth,asyncRoute,audit,notifyAudience:activity.audience});
  require('./observatory')({app,pool,auth,asyncRoute,audit});
- const web=path.join(__dirname,'web');app.get('/',(req,res)=>res.sendFile(path.join(web,'index.html')));app.get(['/app.js','/app.css','/work-ui.js','/coord-ui.js','/resource-ui.js','/insights-ui.js','/push-ui.js','/attachments-ui.js','/collaboration-ui.js','/reminders-exports-ui.js','/observatory-ui.js','/civ-outline.geojson','/sw.js','/manifest.webmanifest','/icon-192.png','/icon-512.png'],(req,res)=>res.sendFile(path.join(web,req.path.slice(1))));
+ const web=path.join(__dirname,'web');app.get('/',(req,res)=>res.sendFile(path.join(web,'index.html')));app.get(['/app.js','/app.css','/work-ui.js','/coord-ui.js','/resource-ui.js','/insights-ui.js','/push-ui.js','/attachments-ui.js','/collaboration-ui.js','/mailroom-ui.js','/reminders-exports-ui.js','/observatory-ui.js','/civ-outline.geojson','/sw.js','/manifest.webmanifest','/icon-192.png','/icon-512.png'],(req,res)=>res.sendFile(path.join(web,req.path.slice(1))));
  app.use('/api',(req,res)=>res.status(404).json({error:'Ressource introuvable.'}));app.use(errorHandler);
- return {app,pool,push,reminders}
+ return {app,pool,push,reminders,courier}
 }
-if(require.main===module){build().then(({app,push,reminders})=>app.listen(PORT,'0.0.0.0',()=>{reminders.start();push.start();console.log('DRENAET CI — étapes 1–9 : serveur prêt sur le port '+PORT)})).catch(e=>{console.error('Démarrage refusé :',e.message);process.exitCode=1})}
+if(require.main===module){build().then(({app,push,reminders,courier})=>app.listen(PORT,'0.0.0.0',()=>{reminders.start();push.start();courier.start();console.log('DRENAET CI — bureau administratif numérique : serveur prêt sur le port '+PORT)})).catch(e=>{console.error('Démarrage refusé :',e.message);process.exitCode=1})}
 module.exports={build};
