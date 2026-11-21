@@ -1,52 +1,33 @@
-# DRENAET CI — étapes 1–2 (projet web séparé)
+# DRENAET CI — étapes 1–3
 
-**Statut : application testée localement sur PostgreSQL et Chromium, non déployée sur le Render existant.** Instructions, missions et alertes *internes* de l'étape 2 sont disponibles ; messagerie, rapports autonomes, bibliothèque, calendrier, statistiques métiers et push système restent à construire. Ne pas remplacer l'APK EDUC CI ni supprimer ses données. Voir [ETAPE_2_INSTRUCTIONS_MISSIONS.md](ETAPE_2_INSTRUCTIONS_MISSIONS.md) pour le périmètre et les limites.
+Application web institutionnelle distincte de l'ancien essai APK. Étapes 1–2 : identité, affectations, instructions, missions et alertes internes. **Étape 3 : messagerie privée et rapports textuels à circuits configurables.** Les élèves et parents ne participent pas à la v1.
 
-## Contenu réellement opérationnel
+**Statut : étape 3 testée sur PostgreSQL local et Chromium (bureau + largeur mobile simulée), non déployée sur Render.** Lors du contrôle public précédent, l'application des étapes 1–2 et `/healthz` répondaient sur le service Render, mais nous n'avons pas accès à sa base, à ses sessions privées ou à ses sauvegardes. Aucun test de l'étape 3 n'a été effectué sur Render ou sur téléphone physique. Voir [ETAPE_3_MESSAGERIE_RAPPORTS.md](ETAPE_3_MESSAGERIE_RAPPORTS.md).
 
-- Entrée web responsive sans comptes élève/parent et sans faux comptes de démonstration.
-- Création initiale unique d'un administrateur général à partir d'identifiants **privés** de démarrage ; jamais réinitialisé à chaque redémarrage.
-- Sessions HTTP-only, 12 heures, CSRF, restrictions d'origine, mots de passe dérivés par scrypt salé, protection contre les essais répétés ; cookies `Secure` lorsque la requête arrive par HTTPS (proxy Render pris en compte).
-- Première connexion avec code provisoire aléatoire à usage unique, expiration à 7 jours, puis choix d'un secret personnel de 12 à 128 caractères. Réinitialisation par un supérieur habilité, invalidation des sessions.
-- Directions régionales multiples, établissements et services ; affectations et listes filtrées serveur par direction/établissement. Journal des opérations d'administration append-only (déclencheur SQL).
-- Administrateur général : directions, unités, collaborateurs non généraux, labels de fonctions et journal global. Directeur régional : unités et collaborateurs de sa région, journal de sa région. Chef d'établissement : subordonnés de son établissement. Autres rôles : profil et tableau de bord en lecture de leur seul périmètre.
-- Noms des fonctions ajustables par administrateur général ; clés de rôle et plafonds d'attribution protégés côté serveur. Les instructions et missions de l'étape 2 sont tracées et limitées aux liens hiérarchiques directs autorisés. Les autres délégations et circuits métier restent pour de futures étapes.
-- Migrations versionnées et non destructives dans le schéma PostgreSQL isolé `drenaet_ci`, même si une base existante contient d'autres tables dans `public`.
+## Fonctionnement
 
-## Installer sur un service Node.js distinct, après sauvegarde de l'existant
+- Comptes activés individuellement avec code provisoire à usage unique ; sessions HTTP-only, CSRF, mot de passe personnel de 12–128 caractères, rôles et rattachements contrôlés côté serveur. L'administrateur général est distinct des directeurs régionaux.
+- Directions, établissements et services multiples avec séparation serveur des périmètres. Comptes suspendus bloqués ; audit des opérations sensibles conservé.
+- Instructions et missions hiérarchiques avec échéances, priorités, états, réponses et validations tracées ; alertes **internes** ciblées, non assimilées au push système.
+- Messages privés 1 à 1 entre personnes actives reliées directement dans la hiérarchie ou affectées à la même unité. Lecture des conversations réservée aux participants ; le simple affichage de la liste ne marque pas les messages ouverts.
+- Modèles de rapports centraux ou propres à une direction ; étapes ordonnées chef d'établissement → directeur régional → administration générale, selon la ligne hiérarchique effective de l'auteur. L'auteur soumet, reçoit d'éventuelles demandes de correction, resoumet sans effacer l'ancienne version ; seuls les validateurs désignés approuvent leur étape.
+- PostgreSQL obligatoire, schéma isolé `drenaet_ci` et migrations transactionnelles additives 001, 002 et 003. Les anciennes données dans d'autres schémas ne sont pas importées ni supprimées.
 
-Node.js >=20. Ne configurez **pas** les mots de passe ou URL de base dans les fichiers, le dépôt, un ZIP public ou une capture d'écran.
+**Non livrés :** pièces jointes, stockage de fichiers privés, messagerie de groupe, choix libre de validateurs nominatifs, push système, bibliothèque, calendrier, statistiques métiers. Aucun texte ou média utilisateur n'est traduit automatiquement. Les circuits avec plusieurs titulaires du même rôle ne sont pas résolus arbitrairement : le dépôt est refusé tant que la configuration des comptes n'est pas univoque.
 
-```text
-npm install
-npm start
-```
+## Déploiement du delta 3
 
-Variables **à définir dans l'interface privée du service Render**, sans changer arbitrairement les variables déjà présentes :
+L'archive de l'étape 3 contient **seulement les fichiers ajoutés ou modifiés depuis le colis 2**. Extraire et reporter ces fichiers au même chemin dans le dépôt existant ; **ne pas téléverser le ZIP comme fichier applicatif**, ni remplacer le dépôt par cette archive seule. Node.js >=20 ; `npm install`, `npm start`.
 
-- `DATABASE_URL` : URL privée de connexion PostgreSQL **directe, non poolée** ; ne pas divulguer la valeur déjà configurée sur Render. Le projet rejette `-pooler` avant de se connecter car ses migrations et `search_path` requièrent une session directe. Utiliser un compte SQL habilité pour le schéma dédié et conserver la vérification TLS. Faire tourner tout secret publié auparavant.
-- `BOOTSTRAP_LOGIN` : identifiant de l'administrateur général à créer **uniquement si la table des comptes DRENAET CI est vide**.
-- `BOOTSTRAP_PASSWORD` : secret initial robuste de cet administrateur, strictement privé ; une fois le premier compte créé, la variable ne le réinitialise plus. Retirer la variable de démarrage après la création et déplacer le secret dans le gestionnaire de mots de passe institutionnel.
-- `PORT` : défini automatiquement par Render.
-- `DRENAET_ALLOW_PREVIEW=1` : réservé exclusivement à un aperçu local intégré ; **ne jamais l'activer en production** (désactive la protection anti-intégration dans une iframe pour cet aperçu).
+`DATABASE_URL` demeure configurée **en privé** dans Render et doit utiliser une connexion PostgreSQL **directe, non poolée** (pas de suffixe Neon `-pooler`) ; le programme utilise un `search_path` de session et exécute les migrations au démarrage. Ne divulguez pas la valeur, ne l'inscrivez pas dans GitHub ni dans ce ZIP. `BOOTSTRAP_LOGIN` et `BOOTSTRAP_PASSWORD` servent uniquement à la création initiale si aucun compte n'existe ; une fois le compte administrateur actif et sa reconnexion vérifiée, la variable secrète de bootstrap peut être retirée lors d'un déploiement planifié sans réinitialiser le compte. `PORT` est fourni par Render. **Ne pas activer `DRENAET_ALLOW_PREVIEW=1` en production.**
 
-**IMPORTANT :** l'absence de `DATABASE_URL` ou du secret initial au premier démarrage fait échouer le service de façon explicite ; il n'y a ni base locale silencieuse ni comptes publics de démonstration. La sauvegarde réelle et la connexion à la base Render ne peuvent pas être vérifiées depuis cet environnement sans accès autorisé. Ne pas redéployer le service qui héberge actuellement l'APK avant d'avoir identifié son dépôt, sauvegardé son éventuel stockage et décidé du remplacement.
+Avant le prochain déploiement : confirmer l'inventaire de la base, sa sauvegarde et la restauration, puis la version actuelle du dépôt. La migration 003 est appliquée **automatiquement au premier démarrage** du code ; elle crée de nouvelles tables et ne supprime ni les comptes ni les instructions/missions existantes. Une migration 002→003 avec données préexistantes a été testée sur une base locale, mais **pas sur Neon**. Après déploiement : vérifier logs, `/healthz`, connexion/reconnexion, isolation de deux directions, envoi/réception d'un message et soumission/validation d'un rapport avec des comptes de test autorisés.
 
-### Vérifications locales
+Tests locaux, sur une URL de **test uniquement** dont le rôle peut créer et supprimer des bases temporaires :
 
 ```text
 npm test
-TEST_DATABASE_URL=postgres://... npm test
-AC_RUN_BROWSER_TESTS=1 TEST_DATABASE_URL=postgres://... npm test
+AC_RUN_BROWSER_TESTS=1 TEST_DATABASE_URL=postgres://<base-locale-de-test> npm test
 ```
 
-La suite sans URL locale exécute les tests unitaires et ignore intentionnellement l'intégration PostgreSQL et Chromium. La suite avec URL de **test seulement**, dont l'utilisateur SQL peut créer/supprimer ses bases, crée des bases temporaires, teste API et navigateur et les détruit ensuite. Ne jamais définir `TEST_DATABASE_URL` sur la base de production. Chromium nécessite `npx playwright install chromium` et ses dépendances système. Les tests couvrent aussi les instructions et missions, transitions, déduplication des alertes, immutabilité des événements, et les parcours navigateur desktop/mobile simulé. Ils ne vérifient pas Render ni des téléphones physiques.
-
-## Séquence prudente pour l'intégration
-
-1. Identifier le **nouveau dépôt** relié au Web Service visé ; examiner sa configuration et les variables **par nom seulement**. Ne pas téléverser ce dossier sur l'ancien service EDUC CI par erreur.
-2. Faire sauvegarder la vraie base PostgreSQL avec un plan de restauration testé sur une base distincte ; ne jamais effacer un schéma existant.
-3. Déployer ce projet web sur un service Node.js distinct ou après décision explicite de bascule, puis vérifier `/healthz`, `/api/auth/session`, login initial, création de 2 directions, isolation et reconnexion après redémarrage Render.
-4. Inventorier les données éventuellement conservées dans des appareils utilisant l'APK antérieur. Leur export/import (et le traitement des données relatives aux élèves) nécessitent un accord, un schéma et un test de migration séparés. Aucun import ni effacement n'est effectué dans l'étape 1.
-
-Voir [ETAPE_1_DIAGNOSTIC_ET_ARCHITECTURE.md](ETAPE_1_DIAGNOSTIC_ET_ARCHITECTURE.md) pour le diagnostic, les décisions de hiérarchie et les étapes suivantes.
+`npm test` sans URL locale ignore les tests PostgreSQL/Chromium ; Chromium nécessite `npx playwright install --with-deps chromium`. Ne jamais exécuter `TEST_DATABASE_URL` contre la base de production. Se reporter aussi aux documents des étapes 1 et 2 pour l'architecture antérieure.
