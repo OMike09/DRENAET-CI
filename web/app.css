@@ -11,3 +11,5 @@ textarea{font:inherit;resize:vertical;min-height:90px}.field textarea{width:100%
 .stat-filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}.stat-filters .button{min-width:78px}.metric strong{overflow-wrap:anywhere}
 /* Étape 7 : pièces jointes privées, commande du microphone et lecture audio. */
 .pj{min-width:0}.pj .pj-list{max-height:220px;overflow:auto}.pj .field input[type=file]{font-size:13px;overflow:hidden}.pj .form-actions{justify-content:flex-start}.pj .pj-player audio{width:min(100%,360px);margin-top:10px}.pj .table td{overflow-wrap:anywhere}.pj .pj-status{color:#536c78}
+
+.collab-members{display:flex;flex-direction:column;gap:9px;max-height:210px;overflow:auto;min-width:0;border:1px solid #d8e1e5;border-radius:9px;padding:12px;margin:12px 0}.collab-members label{display:block;cursor:pointer}.collab-members span{display:flex;align-items:center;gap:9px;justify-content:space-between;flex-wrap:wrap}.collab-members .button{padding:5px 9px}
