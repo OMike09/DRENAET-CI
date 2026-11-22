@@ -1,8 +1,8 @@
 {
   "name": "drenaet-ci",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "private": true,
-  "description": "DRENAET CI — colis 15 : devoirs, évaluations et surveillances",
+  "description": "DRENAET CI — colis 16 : emplois du temps intelligents et versionnés",
   "engines": {
     "node": ">=20"
   },
