@@ -1,8 +1,8 @@
 {
   "name": "drenaet-ci",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "private": true,
-  "description": "DRENAET CI — colis 16 : emplois du temps intelligents et versionnés",
+  "description": "DRENAET CI — colis 17 : cahier de textes et gestion des notes",
   "engines": {
     "node": ">=20"
   },
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "csv-parse": "^5.6.0",
+    "exceljs": "^4.4.0",
     "express": "^4.21.2",
     "jszip": "^3.10.2",
     "nodemailer": "^6.10.1",

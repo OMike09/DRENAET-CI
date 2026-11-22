@@ -1,0 +1,16 @@
+'use strict';
+const S=require('./security');
+const q=(c,sql,params=[])=>c.query(sql,params);
+const id=x=>{let n=Number(x);if(!Number.isSafeInteger(n)||n<1)S.fail('Identifiant invalide.',400);return n};
+const text=(x,label,max=5000,optional=false)=>{if(optional&&(x==null||x===''))return '';if(typeof x!=='string'||!x.trim()||x.length>max||/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(x))S.fail(label+' invalide.',400);return x.trim()};
+const date=x=>{if(typeof x!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(x)||!Number.isFinite(Date.parse(x+'T00:00:00Z'))||new Date(x+'T00:00:00Z').toISOString().slice(0,10)!==x)S.fail('Date invalide.',400);return x};
+const fmt=x=>x instanceof Date?x.toISOString().slice(0,10):String(x||'').slice(0,10);
+const time=x=>{if(x==null||x==='')return null;if(typeof x!=='string'||!/^([01]\d|2[0-3]):[0-5]\d$/.test(x))S.fail('Heure HH:MM invalide.',400);return x};
+const number=(x,min,max,places=2)=>{if(x==null||x===''||!/^\d+(?:\.\d{1,2})?$/.test(String(x)))S.fail('Nombre invalide.',400);let n=Number(x);if(n<min||n>max||Math.round(n*10**places)!==n*10**places)S.fail('Nombre hors limites.',400);return n};
+function school(a){if(!['school_head','ace_aces','teacher','educator'].includes(a.role_key)||!a.organization_id)S.fail('Établissement requis.',403);return id(a.organization_id)}
+async function term(c,n,schoolId,write=false){let t=(await q(c,"SELECT t.*,y.school_id,y.status year_status,y.label year_label,y.starts_on year_start,y.ends_on year_end FROM academic_terms t JOIN academic_years y ON y.id=t.year_id WHERE t.id=$1 AND y.scope='school' AND y.school_id=$2",[id(n),schoolId])).rows[0];if(!t)S.fail('Trimestre inaccessible.',404);if(write&&!(t.year_status==='active'&&t.status==='open'))S.fail('Trimestre non ouvert ; une réouverture exceptionnelle motivée est nécessaire.',409);return t}
+async function assignment(c,n,t,a,write=false){let at=(await q(c,'SELECT aa.*,cl.school_id,cl.year_id,cl.name class_name,ac.status teacher_status,ac.organization_id teacher_school FROM academic_assignments aa JOIN academic_classes cl ON cl.id=aa.class_id JOIN accounts ac ON ac.id=aa.teacher_id WHERE aa.id=$1',[id(n)])).rows[0];if(!at||String(at.year_id)!==String(t.year_id)||String(at.school_id)!==String(t.school_id))S.fail('Affectation hors trimestre ou établissement.',403);if(write&&(a.role_key!=='teacher'||String(at.teacher_id)!==String(a.id)||at.teacher_status!=='active'||String(at.teacher_school)!==String(t.school_id)))S.fail('Enseignant actuellement affecté requis.',403);return at}
+async function delegate(c,a,schoolId,flag){if(a.role_key==='school_head'&&String(a.organization_id)===String(schoolId))return true;if(a.role_key!=='ace_aces'||String(a.organization_id)!==String(schoolId))return false;return !!(await q(c,`SELECT 1 FROM academic_delegations d WHERE school_id=$1 AND ace_id=$2 AND ${flag} AND revoked_at IS NULL AND role_at_grant='ace_aces' AND organization_at_grant=$1`,[schoolId,a.id])).rowCount}
+async function log(c,req,audit,kind,target,idValue,details={},reason=null){await audit(c,req,'pedag.'+kind,target,idValue,req.actor.region_id,{...details,...(reason?{reason}:{})})}
+const lockSchool=(c,schoolId)=>q(c,'SELECT pg_advisory_xact_lock($1::bigint)',[4800000000+Number(schoolId)]);
+module.exports={S,q,id,text,date,time,fmt,number,school,term,assignment,delegate,log,lockSchool};
