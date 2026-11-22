@@ -27,3 +27,12 @@ textarea{font:inherit;resize:vertical;min-height:90px}.field textarea{width:100%
   table {width:100%;border-collapse:collapse}
   td,th {border:1px solid #999;padding:5px;text-align:left}
 }
+
+.att-badge{display:inline-block;border-radius:999px;padding:4px 10px;font-size:.82rem;font-weight:700;white-space:nowrap;border:1px solid transparent}
+.att-on_time{background:#d9f4e6;color:#075b35;border-color:#86cba6}
+.att-light{background:#fff5c5;color:#695200;border-color:#e5ce55}
+.att-serious{background:#ffe3bf;color:#853b00;border-color:#edaf64}
+.att-grave{background:#fbd9dc;color:#970e24;border-color:#e5828e}
+.att-very_grave{background:#63152b;color:#fff;border-color:#3a0b19}
+.att-none{background:#e7edf0;color:#344653;border-color:#b5c1c7}
+@media print{.att-badge{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
