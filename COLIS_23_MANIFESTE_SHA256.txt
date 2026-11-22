@@ -1,0 +1,22 @@
+DRENAET CI — Colis 23, delta à appliquer après le colis 22. Vérifier les SHA-256 avant installation.
+SHA-256                                  Fichier
+46eab0f182cf784e43fe0eb946d95d70d1e15749b51ce51b1986ccd391350f8c  ETAPE_23_COUVERTURE_IDENTITE_MENAET.md
+362798a121da1d6955a4025bfc971fdc1f30e93824eb14b45a103374ba44fffe  actors.js
+e00e044154c51f64ebbf641684f70625b740ef2b4fad2004728bc58601063d1e  courier.js
+5a80d6164fb44c760ffe78db44e0430b59e775f6022a892ca20999deadd6be55  export-formats.js
+b351f21455f85e47fb3faaa79ccd14d2aa3f4af077f86116c0ef7e994d31095e  observatory.js
+9fcfa55a269288510e13cd1e10d9c45b3faf652ace7a33a0a624bc1f360ea7ac  package-lock.json
+a0c33f272a2948427f2bcdcc9087f26f5a26ad50771a06b766eed3c479b672ea  package.json
+e6172b10561cdbbaa614f5cc6e9bcb3a6a58f68e81fd0b2cf4ff2bcee50f85c4  reminders-exports.js
+78cd01ccc95a2a056b595e0614b984de99d9aa62c442906ecfa4544498f6d348  server.js
+fdb335e4401a3835edaa257c92ace844fc7284026dae37b8d73bc2feb7bcc92f  tests/identity23-browser.test.js
+96bdc28b98432de07c6334f611f69d05d762bf225208723d7b527130e67d2c82  timetables.js
+fe97a72e6e41cc289c9b62154403ccd6bbaef72affd3b952afdd143a38717667  training.js
+b4180a65aa1acac7ecb78ea0471c9c340b653d5a12e40be7253d099ae990d266  ui-customization.js
+0abec8ed829a98ba10ae453010ada274d2742916d4781ea512bf5cb8f8e9e93b  web/app.css
+00219b42ba6f3d64dd8c15353a1214c099af9eaf86d196f450ef44786bf36e9c  web/app.js
+639d85edcf3820a3014db4cd050690a8535d662fdf8d34c0adbe471e89afbe3d  web/customization-ui.js
+10526206cd78b77e593630168e36f9b5dd37797931b9ddd2eec3b53e119a49af  web/index.html
+6c59d6a584e5c2a7624de08c024915e4c5168107948836fbe8d09a71dd398333  web/manifest.webmanifest
+1c927d776e5175b5608db2f8e80d5ea5c910587bbffb16c06bde688359bf8819  web/ministere-couverture-mobile.webp
+6f51d84dc0d74a62ed294c1f5c8bc7e4ad5b7789b3da0befca6b3c5bc072ac74  web/not-found.html

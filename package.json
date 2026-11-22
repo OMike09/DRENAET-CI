@@ -1,8 +1,8 @@
 {
   "name": "drenaet-ci",
-  "version": "0.22.0",
+  "version": "0.23.0",
   "private": true,
-  "description": "DRENAET CI — colis 22 : paramètres académiques 2026–2027 et référentiels configurables",
+  "description": "DRENAET CI — colis 23 : couverture authentique et identité visuelle DRENAET CI – MENAET CI",
   "engines": {
     "node": ">=20"
   },
