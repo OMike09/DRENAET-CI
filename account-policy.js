@@ -9,7 +9,7 @@ async function authority(c,actor,target,action){if(!actor||!target||same(actor.i
  if(!await enabled(c,actor,target.role_key,action))return false;
  if(actor.role_key==='platform_admin')return true;
  if(actor.role_key==='regional_director')return same(actor.region_id,target.region_id)&&target.role_key!=='regional_director';
- if(actor.role_key==='school_head')return same(actor.organization_id,target.organization_id)&&S.SCHOOL_SUBORDINATES.has(target.role_key);
+ if(actor.role_key==='school_head')return same(actor.organization_id,target.organization_id)&&(S.SCHOOL_SUBORDINATES.has(target.role_key)||target.role_key==='parent'&&['view','reset','disable','suspend','reactivate','history'].includes(action));
  if(!same(actor.organization_id,target.organization_id)||!same(actor.region_id,target.region_id))return false;
  const ranks=await c.query('SELECT role_key,rank FROM roles WHERE role_key=ANY($1::text[])',[[actor.role_key,target.role_key]]);let rank=Object.fromEntries(ranks.rows.map(x=>[x.role_key,x.rank]));if(!(rank[actor.role_key]>rank[target.role_key]))return false;
  return !!(await c.query('SELECT 1 FROM account_responsibilities WHERE manager_id=$1 AND dependent_id=$2 AND revoked_at IS NULL',[actor.id,target.id])).rowCount;

@@ -1,0 +1,304 @@
+
+> drenaet-ci@0.25.0 test
+> node --test --test-concurrency=1 tests/*.test.js
+
+TAP version 13
+# Subtest: Année et trimestres hiérarchisés : classes, devoirs, notes, cosignature, réouverture et calendrier
+ok 1 - Année et trimestres hiérarchisés : classes, devoirs, notes, cosignature, réouverture et calendrier
+  ---
+  duration_ms: 7671.945195
+  ...
+# Subtest: Comptes 18 : matrice configurable, ACE et économe sans pouvoirs implicites, rattachement nominatif, audit et périmètres
+ok 2 - Comptes 18 : matrice configurable, ACE et économe sans pouvoirs implicites, rattachement nominatif, audit et périmètres
+  ---
+  duration_ms: 8196.540365
+  ...
+# Subtest: Chromium mobile : notifications internes unifiées et statistiques sans fuite
+ok 3 - Chromium mobile : notifications internes unifiées et statistiques sans fuite
+  ---
+  duration_ms: 6254.030833
+  ...
+# Subtest: PostgreSQL : notifications ciblées après succès, ouverture réelle et statistiques cloisonnées
+ok 4 - PostgreSQL : notifications ciblées après succès, ouverture réelle et statistiques cloisonnées
+  ---
+  duration_ms: 4265.313279
+  ...
+# Subtest: Chromium mobile : catégories, annonce, vue distincte, accusé et demande enseignante
+ok 5 - Chromium mobile : catégories, annonce, vue distincte, accusé et demande enseignante
+  ---
+  duration_ms: 6766.86377
+  ...
+# Subtest: Colis 13 PostgreSQL : catégories, destinataires hiérarchiques, vues, accusés, relances et demandes privées
+ok 6 - Colis 13 PostgreSQL : catégories, destinataires hiérarchiques, vues, accusés, relances et demandes privées
+  ---
+  duration_ms: 3854.330952
+  ...
+# Subtest: Chromium mobile : ajout privé PDF aux dossiers, réglage admin et enregistrement vocal simulé
+ok 7 - Chromium mobile : ajout privé PDF aux dossiers, réglage admin et enregistrement vocal simulé
+  ---
+  duration_ms: 6700.563389
+  ...
+# Subtest: PostgreSQL : fichiers et audio privés par dossier, quota administrateur, immutabilité et redémarrage
+ok 8 - PostgreSQL : fichiers et audio privés par dossier, quota administrateur, immutabilité et redémarrage
+  ---
+  duration_ms: 3929.355447
+  ...
+# Subtest: Pointage PostgreSQL : configuration hiérarchique, seuils figés, pointages distincts, justifications, corrections, remontée et droits
+ok 9 - Pointage PostgreSQL : configuration hiérarchique, seuils figés, pointages distincts, justifications, corrections, remontée et droits
+  ---
+  duration_ms: 8107.78615
+  ...
+# Subtest: Chromium réel : connexion, structure, code provisoire, activation, navigation mobile
+ok 10 - Chromium réel : connexion, structure, code provisoire, activation, navigation mobile
+  ---
+  duration_ms: 6584.995539
+  ...
+# Subtest: Chromium mobile : registre, PDF, transmission, accusé et messagerie de groupe
+ok 11 - Chromium mobile : registre, PDF, transmission, accusé et messagerie de groupe
+  ---
+  duration_ms: 9638.060649
+  ...
+# Subtest: Colis 8 PostgreSQL : registre, transmission, accusé, fichiers privés, groupes et isolation
+ok 12 - Colis 8 PostgreSQL : registre, transmission, accusé, fichiers privés, groupes et isolation
+  ---
+  duration_ms: 4684.593542
+  ...
+# Subtest: Chromium bureau/mobile : messagerie privée et dépôt/validation de rapport
+ok 13 - Chromium bureau/mobile : messagerie privée et dépôt/validation de rapport
+  ---
+  duration_ms: 8899.830554
+  ...
+# Subtest: PostgreSQL : messages privés, circuits de rapports et historique après redémarrage
+ok 14 - PostgreSQL : messages privés, circuits de rapports et historique après redémarrage
+  ---
+  duration_ms: 4182.410301
+  ...
+# Subtest: Colis 22 : 2026-2027 disponible, dates de presse non certifiées et échéances nulles, trimestres, catalogue commun et établissement isolé
+ok 15 - Colis 22 : 2026-2027 disponible, dates de presse non certifiées et échéances nulles, trimestres, catalogue commun et établissement isolé
+  ---
+  duration_ms: 6339.509308
+  ...
+# Subtest: Identité 23 : couverture authentique bord à bord, noms cohérents, PWA et parcours de tous les rôles sur ordinateur et téléphone
+ok 16 - Identité 23 : couverture authentique bord à bord, noms cohérents, PWA et parcours de tous les rôles sur ordinateur et téléphone
+  ---
+  duration_ms: 57290.860181
+  ...
+# Subtest: PostgreSQL réel : isolation multi-DRENAET, activation, privilèges, audit, sessions et redémarrage
+ok 17 - PostgreSQL réel : isolation multi-DRENAET, activation, privilèges, audit, sessions et redémarrage
+  ---
+  duration_ms: 4681.090139
+  ...
+# Subtest: Chromium mobile : circuit numérique et dossier historique sans doublon
+ok 18 - Chromium mobile : circuit numérique et dossier historique sans doublon
+  ---
+  duration_ms: 5173.981336
+  ...
+# Subtest: Courrier numérique : circuit multi-comptes, confidentialité, pièces, rappel, visa, email et archivage
+ok 19 - Courrier numérique : circuit multi-comptes, confidentialité, pièces, rappel, visa, email et archivage
+  ---
+  duration_ms: 4656.75468
+  ...
+# Subtest: PostgreSQL : 011 → 012 conserve courriers, alertes et comptes sans créer de fausse attestation
+ok 20 - PostgreSQL : 011 → 012 conserve courriers, alertes et comptes sans créer de fausse attestation
+  ---
+  duration_ms: 1112.053782
+  ...
+# Subtest: Migration additive 016 → 017 : comptes, anciens cours/notes, emplois du temps et alertes intacts
+ok 21 - Migration additive 016 → 017 : comptes, anciens cours/notes, emplois du temps et alertes intacts
+  ---
+  duration_ms: 1020.955918
+  ...
+# Subtest: Migration 019 → 020 : conserver les vrais pointages et justificatifs, reprendre seulement les alertes réelles et ne simuler aucune absence
+ok 22 - Migration 019 → 020 : conserver les vrais pointages et justificatifs, reprendre seulement les alertes réelles et ne simuler aucune absence
+  ---
+  duration_ms: 1009.141502
+  ...
+# Subtest: Migration additive 020 → 021 : visuels du pointage repris en profil sans déplacer les images ni les données métier
+ok 23 - Migration additive 020 → 021 : visuels du pointage repris en profil sans déplacer les images ni les données métier
+  ---
+  duration_ms: 1118.978032
+  ...
+# Subtest: Migration additive 021 → 022 : anciennes années et notes conservées, échéances nouvelles facultatives, aucun faux compte
+ok 24 - Migration additive 021 → 022 : anciennes années et notes conservées, échéances nouvelles facultatives, aucun faux compte
+  ---
+  duration_ms: 1393.352371
+  ...
+# Subtest: PostgreSQL : migration additive 002 -> version actuelle, sans perte des comptes, instructions ou missions
+ok 25 - PostgreSQL : migration additive 002 -> version actuelle, sans perte des comptes, instructions ou missions
+  ---
+  duration_ms: 1147.454642
+  ...
+# Subtest: PostgreSQL : migration 003 -> version actuelle conserve messages et rapports antérieurs
+ok 26 - PostgreSQL : migration 003 -> version actuelle conserve messages et rapports antérieurs
+  ---
+  duration_ms: 1162.491996
+  ...
+# Subtest: PostgreSQL : migration 004 -> version actuelle conserve fichiers, agenda et anciennes alertes
+ok 27 - PostgreSQL : migration 004 -> version actuelle conserve fichiers, agenda et anciennes alertes
+  ---
+  duration_ms: 1237.099396
+  ...
+# Subtest: PostgreSQL : migration 005 → version actuelle conserve alertes et données sans envoyer rétroactivement
+ok 28 - PostgreSQL : migration 005 → version actuelle conserve alertes et données sans envoyer rétroactivement
+  ---
+  duration_ms: 1397.592111
+  ...
+# Subtest: PostgreSQL : migration 006 → version actuelle conserve comptes, bibliothèque et alertes sans pièce fictive
+ok 29 - PostgreSQL : migration 006 → version actuelle conserve comptes, bibliothèque et alertes sans pièce fictive
+  ---
+  duration_ms: 1177.597276
+  ...
+# Subtest: PostgreSQL : migration 007 → version actuelle conserve les pièces, comptes et notifications antérieures
+ok 30 - PostgreSQL : migration 007 → version actuelle conserve les pièces, comptes et notifications antérieures
+  ---
+  duration_ms: 935.090402
+  ...
+# Subtest: PostgreSQL : migration 008 → 009 conserve groupes, messages et courriers sans alerte fictive
+ok 31 - PostgreSQL : migration 008 → 009 conserve groupes, messages et courriers sans alerte fictive
+  ---
+  duration_ms: 1138.43687
+  ...
+# Subtest: Chromium mobile et bureau : navigation Observatoire, fiche, carte et export sans altérer Statistiques
+ok 32 - Chromium mobile et bureau : navigation Observatoire, fiche, carte et export sans altérer Statistiques
+  ---
+  duration_ms: 8465.079136
+  ...
+# Subtest: Observatoire : fiches validées, disciplines, activités, carte, alertes et exports cloisonnés
+ok 33 - Observatoire : fiches validées, disciplines, activités, carte, alertes et exports cloisonnés
+  ---
+  duration_ms: 4920.312223
+  ...
+# Subtest: Parents, inspections, COGES et examens : périmètres, visas et publication
+ok 34 - Parents, inspections, COGES et examens : périmètres, visas et publication
+  ---
+  duration_ms: 8553.157937
+  ...
+# Subtest: Moteur de moyennes configurables : barèmes, absence non assimilée à zéro et coefficients
+ok 35 - Moteur de moyennes configurables : barèmes, absence non assimilée à zéro et coefficients
+  ---
+  duration_ms: 3.011707
+  ...
+# Subtest: Classement opt-in : ex æquo et aucun rang si une note manque
+ok 36 - Classement opt-in : ex æquo et aucun rang si une note manque
+  ---
+  duration_ms: 1.505343
+  ...
+# Subtest: PostgreSQL : cahier transmis, notes multi-rôles, imports Excel, validation et corrections tracées
+ok 37 - PostgreSQL : cahier transmis, notes multi-rôles, imports Excel, validation et corrections tracées
+  ---
+  duration_ms: 12646.595331
+  ...
+# Subtest: Chromium mobile simulé : accord explicite, abonnement, révocation et fermeture de session
+ok 38 - Chromium mobile simulé : accord explicite, abonnement, révocation et fermeture de session
+  ---
+  duration_ms: 3685.342372
+  ...
+# Subtest: PostgreSQL : push volontaire, file transactionnelle, révocation et aucune fuite de contenu
+ok 39 - PostgreSQL : push volontaire, file transactionnelle, révocation et aucune fuite de contenu
+  ---
+  duration_ms: 3745.393506
+  ...
+# Subtest: Réparation : base migrée 009 sans 008 reçoit 008 sans retirer les rappels ni les anciennes alertes
+ok 40 - Réparation : base migrée 009 sans 008 reçoit 008 sans retirer les rappels ni les anciennes alertes
+  ---
+  duration_ms: 1017.674349
+  ...
+# Subtest: Colis 20 : supervision multi-écoles réelle, alertes quatre couleurs, fiche, échanges, accusés, pièces, isolation, exports et reprise
+ok 41 - Colis 20 : supervision multi-écoles réelle, alertes quatre couleurs, fiche, échanges, accusés, pièces, isolation, exports et reprise
+  ---
+  duration_ms: 9256.701264
+  ...
+# Subtest: Chromium mobile : préférences de rappels, alerte ouverte et téléchargements CSV/PDF/Excel
+ok 42 - Chromium mobile : préférences de rappels, alerte ouverte et téléchargements CSV/PDF/Excel
+  ---
+  duration_ms: 7408.935173
+  ...
+# Subtest: Colis 9 PostgreSQL : rappels sans doublons, préférences, périmètres et exports CSV/PDF/XLSX
+ok 43 - Colis 9 PostgreSQL : rappels sans doublons, préférences, périmètres et exports CSV/PDF/XLSX
+  ---
+  duration_ms: 5153.527297
+  ...
+# Subtest: Chromium desktop/mobile : document PDF privé, téléchargement, calendrier et annulation
+ok 44 - Chromium desktop/mobile : document PDF privé, téléchargement, calendrier et annulation
+  ---
+  duration_ms: 8155.690689
+  ...
+# Subtest: PostgreSQL : fichiers privés, calendrier cloisonné, archives et historique durable
+ok 45 - PostgreSQL : fichiers privés, calendrier cloisonné, archives et historique durable
+  ---
+  duration_ms: 5884.491588
+  ...
+# Subtest: Appels : affectations réelles, brouillon mobile, validation, absences et corrections historisées
+ok 46 - Appels : affectations réelles, brouillon mobile, validation, absences et corrections historisées
+  ---
+  duration_ms: 8646.457895
+  ...
+# Subtest: hierarchy rejects self-promotion, foreign units and lateral management
+ok 47 - hierarchy rejects self-promotion, foreign units and lateral management
+  ---
+  duration_ms: 3.368675
+  ...
+# Subtest: pooled Neon URL is refused before any migration or network request
+ok 48 - pooled Neon URL is refused before any migration or network request
+  ---
+  duration_ms: 102.437344
+  ...
+# Subtest: identifiers and passwords validate, hashed secrets are unique and verifiable
+ok 49 - identifiers and passwords validate, hashed secrets are unique and verifiable
+  ---
+  duration_ms: 744.651691
+  ...
+# Subtest: Devoirs et surveillances : conflits, équité, délégation, absences, remplacements, accusés, exports
+ok 50 - Devoirs et surveillances : conflits, équité, délégation, absences, remplacements, accusés, exports
+  ---
+  duration_ms: 9919.025336
+  ...
+# Subtest: Solveur : horaires exacts, pauses, double occupation et impossibilité explicite
+ok 51 - Solveur : horaires exacts, pauses, double occupation et impossibilité explicite
+  ---
+  duration_ms: 3.991944
+  ...
+# Subtest: Emplois du temps : délégation, validation du chef, conflits et vues réelles, archive intacte
+ok 52 - Emplois du temps : délégation, validation du chef, conflits et vues réelles, archive intacte
+  ---
+  duration_ms: 8803.700653
+  ...
+# Subtest: Chromium téléphone : boutons de préparation et génération sont cliquables, affectation exacte et brouillon réel
+ok 53 - Chromium téléphone : boutons de préparation et génération sont cliquables, affectation exacte et brouillon réel
+  ---
+  duration_ms: 7316.770132
+  ...
+# Subtest: Chromium mobile : catalogue, inscription et évaluation sans masquer les modules précédents
+ok 54 - Chromium mobile : catalogue, inscription et évaluation sans masquer les modules précédents
+  ---
+  duration_ms: 6726.416632
+  ...
+# Subtest: Formation continue : formateur désigné, inscription, quiz, présence, attestation validée et confidentialité multi-région
+ok 55 - Formation continue : formateur désigné, inscription, quiz, présence, attestation validée et confidentialité multi-région
+  ---
+  duration_ms: 5196.840613
+  ...
+# Subtest: Colis 21 : menus versionnés par fonction sans nouveaux droits, couverture fournie, logos indépendants, photos privées et persistance
+ok 56 - Colis 21 : menus versionnés par fonction sans nouveaux droits, couverture fournie, logos indépendants, photos privées et persistance
+  ---
+  duration_ms: 7551.326822
+  ...
+# Subtest: Chromium desktop/mobile : émettre une instruction, ouvrir une alerte et traiter une mission
+ok 57 - Chromium desktop/mobile : émettre une instruction, ouvrir une alerte et traiter une mission
+  ---
+  duration_ms: 9068.956803
+  ...
+# Subtest: PostgreSQL réel : instructions et missions transactionnelles, droits, traces et alertes durables
+ok 58 - PostgreSQL réel : instructions et missions transactionnelles, droits, traces et alertes durables
+  ---
+  duration_ms: 4680.128661
+  ...
+1..58
+# tests 58
+# suites 0
+# pass 58
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 352458.103219

@@ -1,7 +1,7 @@
 'use strict';
 const S=require('./security'),P=require('./account-policy'),{tx}=require('./db'),{pdf,xlsx}=require('./export-formats');
-const groups={administrators:['platform_admin'],directors:['regional_director'],heads:['school_head'],ace:['ace_aces'],economists:['economist'],educators:['educator'],teachers:['teacher']};
-const labels={administrators:'Administrateurs généraux',directors:'Directeurs régionaux (DRENA)',heads:'Chefs d’établissement',ace:'ACE / ACES',economists:'Économes',educators:'Éducateurs',teachers:'Enseignants',others:'Autres personnels autorisés'};
+const groups={administrators:['platform_admin'],directors:['regional_director'],heads:['school_head'],ace:['ace_aces'],economists:['economist'],educators:['educator'],teachers:['teacher'],parents:['parent']};
+const labels={administrators:'Administrateurs généraux',directors:'Directeurs régionaux (DRENA)',heads:'Chefs d’établissement',ace:'ACE / ACES',economists:'Économes',educators:'Éducateurs',teachers:'Enseignants',parents:'Parents d’élèves (comptes)',others:'Autres personnels autorisés'};
 module.exports=function actors({app,pool,auth,asyncRoute,audit}){
  const route=(v,p,fn)=>app[v]('/api/actors'+p,auth,asyncRoute(fn));
  const scope=a=>{let v=P.scopeSQL(a,'a');return {sql:v.sql,p:v.params}};

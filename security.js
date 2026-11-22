@@ -1,6 +1,6 @@
 'use strict';
 const crypto=require('node:crypto');const {promisify}=require('node:util');const scrypt=promisify(crypto.scrypt);
-const ROLE_SCOPE=Object.freeze({platform_admin:'platform',regional_director:'region',regional_secretariat:'region',regional_staff:'region',inspector:'region',school_head:'school',school_deputy:'school',coordinator:'school',service_manager:'service',service_staff:'service',educator:'school',ace_aces:'school',economist:'school',teacher:'school',school_staff:'school'});
+const ROLE_SCOPE=Object.freeze({platform_admin:'platform',regional_director:'region',regional_secretariat:'region',regional_staff:'region',inspector:'region',school_head:'school',school_deputy:'school',coordinator:'school',service_manager:'service',service_staff:'service',educator:'school',ace_aces:'school',economist:'school',teacher:'school',school_staff:'school',parent:'school'});
 const SCHOOL_SUBORDINATES=new Set(['school_deputy','coordinator','ace_aces','economist','educator','teacher','school_staff']);
 const ROOT='platform_admin',REGIONAL='regional_director',SCHOOL='school_head';
 function fail(message,status=400){const e=new Error(message);e.status=status;throw e}

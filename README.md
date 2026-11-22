@@ -1,3 +1,9 @@
+# DRENAET CI — application intégrée (version 0.25.0)
+
+**Colis unique du chantier menus, cahiers, parents, inspection, COGES et examens :** voir [le guide d’installation et les limites explicites](ETAPE_25_COLIS_UNIQUE_MENU_CAHIERS_PARENTS_COGES_EXAMENS.md). Les paragraphes ci-dessous sont conservés comme historique des anciens colis ; ils ne décrivent pas seuls l’état actuel. Ne jamais déployer sur une base de production sans sauvegarde, restauration testée et recette en préproduction.
+
+---
+
 # DRENAET CI — application intégrée (colis 15)
 
 Application Node.js/PostgreSQL destinée aux directions régionales et établissements. Le **colis 13** améliore les Comptes et accès et ajoute les **Annonces** officielles et **Mes demandes** des enseignants, sans supprimer les comptes, courriers, formations ni les autres données existantes. Le colis 14 ajoute une année scolaire hiérarchisée, ses périodes, un socle pédagogique réel et un calendrier agrégé. Le colis 15 ajoute la programmation des devoirs et les surveillances automatiques avec validation humaine ; voir [le guide du colis 15](ETAPE_15_DEVOIRS_SURVEILLANCES.md) avant toute installation.
