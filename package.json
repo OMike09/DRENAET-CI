@@ -1,8 +1,8 @@
 {
   "name": "drenaet-ci",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "private": true,
-  "description": "DRENAET CI — colis 23 : couverture authentique et identité visuelle DRENAET CI – MENAET CI",
+  "description": "DRENAET CI — colis 24 : correction des formulaires et génération des emplois du temps",
   "engines": {
     "node": ">=20"
   },

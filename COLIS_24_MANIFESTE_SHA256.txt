@@ -1,0 +1,8 @@
+DRENAET CI — Colis 24, delta à appliquer après le colis 23. Vérifier les SHA-256 avant installation.
+SHA-256                                  Fichier
+f0c84f9fcdf2d16d0f235cbc17c0e09111bb6d8941ece83d82e66ee106d6688c  ETAPE_24_CORRECTIF_GENERATION_EMPLOIS_DU_TEMPS.md
+d7c28acaf790824cb36f1fc9e06baf24d135056e34070c00cc2209c5ee067937  package-lock.json
+03bba5fa44d00ad4edf7613502d4b70eb7716aa31d81facb02f72e024e0dbff8  package.json
+ad2675b05a3a804cdc038c30c154fa66073bbe53345d470e4c987b3aedb23d7d  tests/timetables-ui-browser.test.js
+08e31bfb9dd1a56b028f5735302fd2cfe20254d322da7959e7877e59d1475148  web/app.js
+206b0925d91ce0d5336107932364965830cd11f7220c76a58ccb3d2bb7f5f67e  web/timetables-ui.js
