@@ -1,0 +1,38 @@
+# Colis 13 — Comptes classés, annonces officielles et demandes privées
+
+## Prérequis et installation prudente
+
+Livraison **additive** sur l’application DRENAET CI existante. Le colis 12 (formation continue) et les migrations **001–012** doivent être effectivement présents dans l’environnement cible ; l’agent ne peut pas vérifier la base privée Neon ni le code réellement exécuté par Render. Le statut d’installation du colis 12 **n’a pas été confirmé par l’utilisateur**. Si ce prérequis manque, installer d’abord le colis 12 ; ne pas appliquer 013 seule sur une base incomplète.
+
+Faire une sauvegarde PostgreSQL cohérente et une **restauration de contrôle isolée**. Copier le contenu du ZIP delta à la racine, aux mêmes chemins, **sans effacer les autres fichiers ni les comptes existants**. Exécuter `npm ci` sous Node.js ≥20 et démarrer selon la procédure existante, avec connexion PostgreSQL directe non poolée pour les migrations. Le démarrage applique `013_actors_announcements_requests.sql` en transaction. Valider en préproduction avec plusieurs régions, puis surveiller `/healthz`, les logs, les notifications et les modules antérieurs. Préparer un retour applicatif sans supprimer automatiquement les données déjà créées. Ne publier aucun secret, fichier `.env`, export privé ni sauvegarde.
+
+## Classification des comptes
+
+Les comptes existants **ne sont ni supprimés ni reclassés automatiquement**. Deux rôles scolaires supplémentaires sont créés : **ACE/ACES** et **économe** ; leur affectation individuelle relève d’un responsable autorisé. La catégorie « autres personnels » recueille les rôles non listés dans les sept autres catégories. Le téléphone facultatif peut être renseigné à la création ou modifié par un responsable autorisé. Les huit catégories affichent total, actifs, suspendus, invitations en attente et créations des 30 derniers jours. Recherche serveur par nom, identifiant, téléphone ou unité ; filtres par DRENAET, établissement, fonction et statut ; fiches hiérarchiques et équipe de la DRENAET / de l’unité ; exports PDF (200 lignes max) et Excel (1 000 lignes max). Sélection groupée transactionnelle pour suspendre ou réactiver jusqu’à 50 comptes, avec vérification de **chaque** compte et fermeture des sessions. Les opérations sensibles préexistantes de création, affectation et réinitialisation conservent leurs contrôles côté serveur. Les champs nom/téléphone se modifient séparément de l’affectation.
+
+## Annonces officielles
+
+L’administrateur général peut cibler l’ensemble de l’application ; un directeur régional, uniquement les subordonnés de sa DRENAET ; un chef, les subordonnés de son établissement ; un adjoint, les rôles scolaires subordonnés autorisés. **ACE/ACES, économe et éducateur** ne peuvent publier que vers les comptes scolaires **nominativement délégués** à cet effet par un responsable habilité du même périmètre. Sans délégation, ils peuvent créer un brouillon, **pas le publier**. Un enseignant ne peut jamais publier d’annonce officielle ou viser un supérieur. Le serveur recalcule l’éligibilité au moment de la publication, même pour une personne ou un groupe sélectionné manuellement ; une désignation hors périmètre fait échouer la publication. Les groupes réutilisent les membres des groupes professionnels existants, sous réserve de vérification de chaque membre. La cible est figée à la publication et ne grossit pas automatiquement si de nouveaux comptes arrivent.
+
+Brouillon (titre, contenu, catégorie, priorité, visibilité programmée et fin, éventuelle date limite, accusé requis), sélection par tous les subordonnés / catégories / région / établissements / groupe / personnes, publication volontaire, archive. La **date de publication effective est enregistrée par le serveur** ; un début futur retarde la visibilité, et la fin empêche une nouvelle consultation active. L’historique d’une annonce expirée reste consultable par ses destinataires sans créer de nouvelle « vue », mais ils ne peuvent plus accuser réception après la fin. Le brouillon est modifiable ; après publication, l’auteur ne peut changer que titre et contenu via une **modification versionnée, auditée et notifiée à tous les destinataires**. Changer silencieusement les cibles ou les échéances publiées n’est pas permis.
+
+Une publication crée une entrée de notification privée pour chaque destinataire sélectionné. Le nombre « reçu » signifie **notification interne créée**, pas livraison confirmée par un appareil, un courriel ou un fournisseur push. La première ouverture, le nombre de consultations répétées et l’accusé volontaire horodaté sont **trois mesures distinctes** ; lire une alerte ne vaut ni ouvrir la fiche ni accuser réception. Le suivi nominatif et les agrégats (ciblés, reçus, ouverts, accusés, non ouverts, non accusés, vues totales) sont réservés à l’auteur et aux responsables de son périmètre. Relance manuelle des non-lecteurs ou des non-accusants (si accusé requis) ; relances automatiques 24/48 heures après la disponibilité effective et avant une éventuelle échéance, sans doublon par phase. Elles respectent l’activation des rappels par chaque compte. Les notifications push restent facultatives selon les réglages existants ; **aucun envoi externe de ces annonces par email n’est inclus**.
+
+## Demandes des enseignants et fichiers
+
+Un enseignant peut envoyer une demande privée à un chef **actif de son propre établissement** : catégorie, objet, description, priorité, date serveur et une pièce éventuelle. Seuls l’enseignant, le chef initial et le responsable actuellement saisi consultent le dossier. Le chef peut accuser réception, traiter, demander un complément, accepter, rejeter avec justification ou transmettre **à un directeur régional actif de la même DRENAET**, qui poursuit le traitement. L’enseignant répond à une demande de complément et suit les statuts envoyée, reçue, en traitement, en attente, acceptée, rejetée, clôturée. Les actions, justifications et dépôts de pièces sont conservés dans un historique non modifiable et notifient les intéressés. Ce canal ne confère aucun droit de publier une annonce.
+
+Une annonce accepte au plus une image et un document ; une demande accepte une pièce. PDF, PNG et JPEG uniquement, **10 Mio maximum par fichier** en PostgreSQL. Quota indépendant des supports de formation : **100 Mio au départ**, réglable uniquement par l’administrateur général entre 20 et **250 Mio**, plafond/fichier réglable de 1 à 10 Mio. Les pièces ne sont pas publiques, ne peuvent pas être remplacées silencieusement, et sont contrôlées par extension et signature sommaire. **Pas d’antivirus, de transcodage vidéo ni de prise en charge des gigaoctets** ; les fichiers augmentent la taille et le temps de sauvegarde de PostgreSQL.
+
+## Tests locaux
+
+Les tests utilisent des **bases temporaires propres** et les suppriment ; ne jamais viser Neon ou une base de production avec `TEST_DATABASE_URL`.
+
+```bash
+npm ci
+npx playwright install chromium
+# Sous Linux : installer aussi les dépendances système de Chromium.
+AC_RUN_BROWSER_TESTS=1 TEST_DATABASE_URL='postgres://UTILISATEUR:MOT_DE_PASSE@127.0.0.1:5432/BASE_DE_TEST' npm test
+```
+
+Vérifications multi-comptes : catégories et recherche, création/édition et export, autorisations hiérarchiques y compris sélection individuelle hors région, délégation et révocation, publication, ouverture répétée distincte, accusé volontaire, relances manuelles et automatiques dédupliquées, fichiers privés, demande privée transmise dans la même région, navigation Chromium mobile et régressions des colis 1–12. **38/38 tests locaux PostgreSQL/Chromium réussis, sans échec ni test ignoré.** Les résultats locaux ne prouvent pas un déploiement sur Render ou une migration de Neon.

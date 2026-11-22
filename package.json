@@ -1,8 +1,8 @@
 {
   "name": "drenaet-ci",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "private": true,
-  "description": "DRENAET CI — colis 12 : formation continue intégrée",
+  "description": "DRENAET CI — colis 13 : acteurs, annonces et demandes hiérarchiques",
   "engines": {
     "node": ">=20"
   },

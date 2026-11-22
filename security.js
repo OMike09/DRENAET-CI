@@ -1,7 +1,7 @@
 'use strict';
 const crypto=require('node:crypto');const {promisify}=require('node:util');const scrypt=promisify(crypto.scrypt);
-const ROLE_SCOPE=Object.freeze({platform_admin:'platform',regional_director:'region',regional_secretariat:'region',regional_staff:'region',inspector:'region',school_head:'school',school_deputy:'school',coordinator:'school',service_manager:'service',educator:'school',teacher:'school',school_staff:'school'});
-const SCHOOL_SUBORDINATES=new Set(['school_deputy','coordinator','educator','teacher','school_staff']);
+const ROLE_SCOPE=Object.freeze({platform_admin:'platform',regional_director:'region',regional_secretariat:'region',regional_staff:'region',inspector:'region',school_head:'school',school_deputy:'school',coordinator:'school',service_manager:'service',educator:'school',ace_aces:'school',economist:'school',teacher:'school',school_staff:'school'});
+const SCHOOL_SUBORDINATES=new Set(['school_deputy','coordinator','ace_aces','economist','educator','teacher','school_staff']);
 const ROOT='platform_admin',REGIONAL='regional_director',SCHOOL='school_head';
 function fail(message,status=400){const e=new Error(message);e.status=status;throw e}
 function login(value){const s=String(value||'').trim().toLowerCase();if(!/^[a-z0-9][a-z0-9._@+-]{2,79}$/.test(s))fail('Identifiant invalide.');return s}
@@ -23,7 +23,7 @@ function canAssign(actor,role,org){if(!actor||!org||ROLE_SCOPE[role]!==org.kind|
 function canList(actor){return !!actor&&[ROOT,REGIONAL,SCHOOL].includes(actor.role_key)}
 // An order is not account administration: only the explicitly defined reporting lines may issue one.
 const REGIONAL_REPORTS=new Set(['regional_secretariat','regional_staff','inspector','school_head','service_manager']);
-const DEPUTY_REPORTS=new Set(['coordinator','educator','teacher','school_staff']);
+const DEPUTY_REPORTS=new Set(['coordinator','ace_aces','economist','educator','teacher','school_staff']);
 function canDirect(actor,target){if(!actor||!target||actor.status!=='active'||target.status!=='active'||String(actor.id)===String(target.id))return false;
  if(actor.role_key===ROOT)return target.role_key===REGIONAL;
  if(actor.role_key===REGIONAL)return String(actor.region_id)===String(target.region_id)&&REGIONAL_REPORTS.has(target.role_key);
