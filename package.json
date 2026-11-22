@@ -1,8 +1,8 @@
 {
   "name": "drenaet-ci",
-  "version": "0.21.0",
+  "version": "0.22.0",
   "private": true,
-  "description": "DRENAET CI — colis 21 : personnalisation des menus, historiques et visuels",
+  "description": "DRENAET CI — colis 22 : paramètres académiques 2026–2027 et référentiels configurables",
   "engines": {
     "node": ">=20"
   },
