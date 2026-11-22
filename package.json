@@ -1,8 +1,8 @@
 {
   "name": "drenaet-ci",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "private": true,
-  "description": "DRENAET CI — colis 13 : acteurs, annonces et demandes hiérarchiques",
+  "description": "DRENAET CI — colis 14 : années, périodes scolaires et suivi pédagogique",
   "engines": {
     "node": ">=20"
   },

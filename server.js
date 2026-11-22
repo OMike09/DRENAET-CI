@@ -65,9 +65,10 @@ async function build(options={}){const pool=await connectDatabase(process.env.DA
  const training=require('./training')({app,pool,auth,asyncRoute,audit,notify:activity.notify});reminders.setTraining(training.remindFor);
  require('./actors')({app,pool,auth,asyncRoute,audit});
  const communications=require('./communications')({app,pool,auth,asyncRoute,audit,notify:activity.notify});reminders.setCommunications(communications.remindFor);
+ require('./academic')({app,pool,auth,asyncRoute,audit,notify:activity.notify});
  require('./resources')({app,pool,auth,asyncRoute,audit,notifyAudience:activity.audience});
  require('./observatory')({app,pool,auth,asyncRoute,audit});
- const web=path.join(__dirname,'web');app.get('/',(req,res)=>res.sendFile(path.join(web,'index.html')));app.get(['/app.js','/app.css','/work-ui.js','/coord-ui.js','/resource-ui.js','/insights-ui.js','/push-ui.js','/attachments-ui.js','/collaboration-ui.js','/mailroom-ui.js','/reminders-exports-ui.js','/observatory-ui.js','/training-ui.js','/actors-ui.js','/communications-ui.js','/civ-outline.geojson','/sw.js','/manifest.webmanifest','/icon-192.png','/icon-512.png'],(req,res)=>res.sendFile(path.join(web,req.path.slice(1))));
+ const web=path.join(__dirname,'web');app.get('/',(req,res)=>res.sendFile(path.join(web,'index.html')));app.get(['/app.js','/app.css','/work-ui.js','/coord-ui.js','/resource-ui.js','/insights-ui.js','/push-ui.js','/attachments-ui.js','/collaboration-ui.js','/mailroom-ui.js','/reminders-exports-ui.js','/observatory-ui.js','/training-ui.js','/actors-ui.js','/communications-ui.js','/academic-ui.js','/civ-outline.geojson','/sw.js','/manifest.webmanifest','/icon-192.png','/icon-512.png'],(req,res)=>res.sendFile(path.join(web,req.path.slice(1))));
  app.use('/api',(req,res)=>res.status(404).json({error:'Ressource introuvable.'}));app.use(errorHandler);
  return {app,pool,push,reminders,courier}
 }
