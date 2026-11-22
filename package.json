@@ -1,8 +1,8 @@
 {
   "name": "drenaet-ci",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "private": true,
-  "description": "DRENAET CI — colis 17 : cahier de textes et gestion des notes",
+  "description": "DRENAET CI — colis 18 : administration des comptes, accès et hiérarchie configurable",
   "engines": {
     "node": ">=20"
   },
