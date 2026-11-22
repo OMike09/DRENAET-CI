@@ -1,6 +1,6 @@
-# DRENAET CI — application intégrée (version 0.25.0)
+# DRENAET CI — application intégrée (version 0.26.0)
 
-**Colis unique du chantier menus, cahiers, parents, inspection, COGES et examens :** voir [le guide d’installation et les limites explicites](ETAPE_25_COLIS_UNIQUE_MENU_CAHIERS_PARENTS_COGES_EXAMENS.md). Les paragraphes ci-dessous sont conservés comme historique des anciens colis ; ils ne décrivent pas seuls l’état actuel. Ne jamais déployer sur une base de production sans sauvegarde, restauration testée et recette en préproduction.
+**Étape 26 : hiérarchie et rattachements réels.** Lire [le guide du delta essentiel et ses limites](ETAPE_26_HIERARCHIE_DELTA_ESSENTIEL.md). Ce delta s'applique uniquement après l'étape 25 ; le projet n'a été vérifié que localement. Les paragraphes historiques ci-dessous ne décrivent pas seuls l’état actuel. Ne jamais déployer sur une base de production sans sauvegarde, restauration testée et recette en préproduction.
 
 ---
 

@@ -1,8 +1,8 @@
 {
   "name": "drenaet-ci",
-  "version": "0.25.0",
+  "version": "0.26.0",
   "private": true,
-  "description": "DRENAET CI — colis 25 : menus groupés, cahiers, parents, inspections, COGES et examens",
+  "description": "DRENAET CI — étape 26 : hiérarchie régionale, structures, établissements et accès tracés",
   "engines": {
     "node": ">=20"
   },
