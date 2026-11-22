@@ -19,7 +19,8 @@ async function build(options={}){const pool=await connectDatabase(process.env.DA
  const dummyPasswordHash=await S.hashPassword(S.token());
  const app=express();app.disable('x-powered-by');app.set('trust proxy',1);
  app.use((req,res,next)=>{const preview=process.env.DRENAET_ALLOW_PREVIEW==='1';res.set({'X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin','Cache-Control':'no-store','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; media-src 'self' blob:; base-uri 'none'; form-action 'self'; object-src 'none'"+(preview?'':"; frame-ancestors 'none'")});if(!preview)res.set('X-Frame-Options','DENY');next()});
- app.use('/api/library/documents',express.json({limit:'3mb'})); // 2 Mio binaires encodés en base64.
+ app.use('/api/library/documents',express.json({limit:'3mb'}));
+ app.use('/api/supervisions/programs',express.json({limit:'3mb'})); // 2 Mio binaires encodés en base64.
  app.use('/api',express.json({limit:'64kb'}));
  app.use('/api',asyncRoute(async(req,res,next)=>{let raw=parseCookie(req.headers.cookie);if(raw){let result=await q(pool,`SELECT a.*,r.label role_label,o.name organization_name,s.csrf_token,s.token_hash FROM sessions s JOIN accounts a ON a.id=s.account_id JOIN roles r ON r.role_key=a.role_key LEFT JOIN organizations o ON o.id=a.organization_id WHERE s.token_hash=$1 AND s.expires_at>now() AND s.auth_version=a.auth_version AND a.status='active'`,[S.hashToken(raw)]);if(result.rowCount){req.actor=result.rows[0];req.session=result.rows[0]}}
  if(!['GET','HEAD','OPTIONS'].includes(req.method)){let origin=req.get('origin');if(origin){let allowed=false;try{allowed=new URL(origin).host===req.get('host')}catch{}if(!allowed)S.fail('Origine non autorisée.',403)}if(![undefined,'same-origin','none'].includes(req.get('sec-fetch-site')))S.fail('Origine non autorisée.',403);if(req.session&&!['/auth/login','/auth/activate'].includes(req.path)&&req.get('x-csrf-token')!==req.session.csrf_token)S.fail('Session à actualiser.',403)}
@@ -66,9 +67,10 @@ async function build(options={}){const pool=await connectDatabase(process.env.DA
  require('./actors')({app,pool,auth,asyncRoute,audit});
  const communications=require('./communications')({app,pool,auth,asyncRoute,audit,notify:activity.notify});reminders.setCommunications(communications.remindFor);
  require('./academic')({app,pool,auth,asyncRoute,audit,notify:activity.notify});
+ require('./supervisions')({app,pool,auth,asyncRoute,audit,notify:activity.notify});
  require('./resources')({app,pool,auth,asyncRoute,audit,notifyAudience:activity.audience});
  require('./observatory')({app,pool,auth,asyncRoute,audit});
- const web=path.join(__dirname,'web');app.get('/',(req,res)=>res.sendFile(path.join(web,'index.html')));app.get(['/app.js','/app.css','/work-ui.js','/coord-ui.js','/resource-ui.js','/insights-ui.js','/push-ui.js','/attachments-ui.js','/collaboration-ui.js','/mailroom-ui.js','/reminders-exports-ui.js','/observatory-ui.js','/training-ui.js','/actors-ui.js','/communications-ui.js','/academic-ui.js','/civ-outline.geojson','/sw.js','/manifest.webmanifest','/icon-192.png','/icon-512.png'],(req,res)=>res.sendFile(path.join(web,req.path.slice(1))));
+ const web=path.join(__dirname,'web');app.get('/',(req,res)=>res.sendFile(path.join(web,'index.html')));app.get(['/app.js','/app.css','/work-ui.js','/coord-ui.js','/resource-ui.js','/insights-ui.js','/push-ui.js','/attachments-ui.js','/collaboration-ui.js','/mailroom-ui.js','/reminders-exports-ui.js','/observatory-ui.js','/training-ui.js','/actors-ui.js','/communications-ui.js','/academic-ui.js','/supervisions-ui.js','/civ-outline.geojson','/sw.js','/manifest.webmanifest','/icon-192.png','/icon-512.png'],(req,res)=>res.sendFile(path.join(web,req.path.slice(1))));
  app.use('/api',(req,res)=>res.status(404).json({error:'Ressource introuvable.'}));app.use(errorHandler);
  return {app,pool,push,reminders,courier}
 }

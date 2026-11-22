@@ -1,12 +1,15 @@
-# DRENAET CI — application intégrée (colis 14)
+# DRENAET CI — application intégrée (colis 15)
 
-Application Node.js/PostgreSQL destinée aux directions régionales et établissements. Le **colis 13** améliore les Comptes et accès et ajoute les **Annonces** officielles et **Mes demandes** des enseignants, sans supprimer les comptes, courriers, formations ni les autres données existantes. Le colis 14 ajoute une année scolaire hiérarchisée, ses périodes, un socle pédagogique réel et un calendrier agrégé. Voir [le guide du colis 14](ETAPE_14_ANNEES_TRIMESTRES.md) avant toute installation.
+Application Node.js/PostgreSQL destinée aux directions régionales et établissements. Le **colis 13** améliore les Comptes et accès et ajoute les **Annonces** officielles et **Mes demandes** des enseignants, sans supprimer les comptes, courriers, formations ni les autres données existantes. Le colis 14 ajoute une année scolaire hiérarchisée, ses périodes, un socle pédagogique réel et un calendrier agrégé. Le colis 15 ajoute la programmation des devoirs et les surveillances automatiques avec validation humaine ; voir [le guide du colis 15](ETAPE_15_DEVOIRS_SURVEILLANCES.md) avant toute installation.
 
 ## Modules conservés
 
-Comptes nominatifs, rôles, établissements, sessions et audit ; instructions et missions, messagerie, rapports, bibliothèque et agenda, statistiques et notifications, push facultatif, pièces privées et notes vocales, courriers historiques et bureau du courrier numérique, groupes, rappels et exports, Observatoire primaire/secondaire, formation continue et attestations à validation humaine. Aucune donnée antérieure n’est réinitialisée par le colis 14.
+Comptes nominatifs, rôles, établissements, sessions et audit ; instructions et missions, messagerie, rapports, bibliothèque et agenda, statistiques et notifications, push facultatif, pièces privées et notes vocales, courriers historiques et bureau du courrier numérique, groupes, rappels et exports, Observatoire primaire/secondaire, formation continue et attestations à validation humaine. Aucune donnée antérieure n’est réinitialisée par le colis 15.
 
 ## Nouveautés
+
+Le colis 15 ajoute « Devoirs et évaluations » pour le chef ou un ACE/ACES spécialement délégué et « Mon programme de surveillance » pour les enseignants : planification en lot, avertissements et contrôle serveur des conflits, propositions de surveillants selon disponibilité et équité, publication groupée atomique, gestion motivée des absences et remplacements, notifications avec consultations/accusés distincts, exports PDF/Excel et calendrier agrégé. Les affectations publiées ne sont pas écrasées par une nouvelle génération.
+
 
 Le module « Année scolaire » (colis 14) définit les années et leurs périodes de référence, puis les déclinaisons régionales et locales ; il inclut délégation ACE/ACES, classes, affectations, devoirs/compositions, notes avec révisions, cahier de textes, événements de surveillance et emploi du temps, rapports attendus/remis, tableaux de bord calculés et calendrier personnel agrégé. Un suivi des notifications distingue envoi interne, consultation réelle de la fiche et accusé volontaire. Les échéances officielles sont bornées et les périodes closes ne permettent aucune note ordinaire.
 
@@ -15,4 +18,4 @@ Huit catégories de comptes avec effectifs et recherche/filtrage serveur ; nouve
 
 ## Installation et vérification
 
-Le **colis 13** et les migrations **001–013** sont des prérequis ; l’utilisateur indique avoir installé le colis 13, mais son état sur Render/Neon n’a pas été vérifié par l’agent. Effectuer une sauvegarde et un test de restauration, copier le ZIP delta à la racine du projet **sans effacer les autres fichiers**, `npm ci` puis démarrer avec Node.js ≥20 et PostgreSQL direct non poolé. La migration 014 est appliquée au démarrage. Vérifier les parcours et les anciennes fonctions en préproduction avant tout déploiement. Les tests PostgreSQL/Chromium isolés sont détaillés dans [le guide](ETAPE_14_ANNEES_TRIMESTRES.md). Aucun déploiement Render ni test authentifié de Neon n’a été effectué par l’agent.
+Le **colis 14** et les migrations **001–014** sont des prérequis ; l’utilisateur ne sait pas si le colis 14 est installé sur la cible. Il faut le vérifier avant de déployer ce delta ; Render/Neon n’ont pas été vérifiés par l’agent. Effectuer une sauvegarde et un test de restauration, copier le ZIP delta à la racine du projet **sans effacer les autres fichiers**, `npm ci` puis démarrer avec Node.js ≥20 et PostgreSQL direct non poolé. La migration 015 est appliquée au démarrage. Vérifier les parcours et les anciennes fonctions en préproduction avant tout déploiement. Les tests PostgreSQL/Chromium isolés sont détaillés dans [le guide](ETAPE_15_DEVOIRS_SURVEILLANCES.md). Aucun déploiement Render ni test authentifié de Neon n’a été effectué par l’agent.
