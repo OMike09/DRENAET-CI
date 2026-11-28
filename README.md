@@ -1,4 +1,6 @@
-# DRENAET CI — application intégrée (version 0.28.0)
+# DRENAET CI — application intégrée (version 0.29.0)
+
+**Étape 29 : audit ciblé des boutons d’annonces et contrôle de version déployée.** Lire [le rapport d’audit](AUDIT_29_BOUTONS_ANNONCES_DEPLOIEMENT.md). Delta à appliquer uniquement après 28 ; aucun code ne débloque un quota PostgreSQL épuisé.
 
 **Étape 28 : améliorations ciblées des emplois du temps et annonces, non-refonte exhaustive.** Lire [le rapport et les limites du delta 28](ETAPE_28_EMPLOIS_ANNONCES_RAPPORT.md). Appliquer uniquement après le delta 27 et après sauvegarde/restauration de préproduction.
 

@@ -28,7 +28,7 @@ async function build(options={}){const pool=await connectDatabase(process.env.DA
  const auth=(req,res,next)=>req.actor?next():next(Object.assign(new Error('Veuillez vous connecter.'),{status:401}));
  // Fail-closed parent API surface: no inherited staff endpoints, even if a menu is misconfigured.
  app.use('/api',(req,res,next)=>{if(req.actor?.role_key!=='parent')return next();let p=req.path;if(p.startsWith('/parents/')||/^\/(?:auth\/(?:session|logout)|profile(?:\/password)?|ui\/(?:brand|menu\/(?:layout|preferences)))$/.test(p)||p==='/ui/profile/'+req.actor.id+'/media'||p==='/ui/media/avatar/'+req.actor.id||p==='/ui/media/profile_cover/'+req.actor.id)return next();return next(Object.assign(new Error('Accès réservé au portail parent.'),{status:403}))});
- app.get('/healthz',(req,res)=>res.json({status:'ok'})); // Sonde de vie : aucune requête Neon automatique.
+ app.get('/healthz',(req,res)=>res.json({status:'ok',version:require('./package.json').version})); // Sonde de vie sans requête PostgreSQL ; version effectivement chargée par ce processus.
  app.get('/readyz',asyncRoute(async(req,res)=>{try{await q(pool,'SELECT 1');res.json({status:'ok'})}catch{res.status(503).json({status:'database_unavailable'})}})); // À utiliser manuellement, pas comme sonde fréquente.
  app.get('/api/auth/session',asyncRoute((req,res)=>res.json({user:req.actor?safeUser(req.actor):null,csrf:req.session?.csrf_token||null})));
  async function throttle(c,req,login){const ip=clientIp(req);let n=await q(c,"SELECT count(*) FILTER(WHERE login=$1)::int account_failures,count(*) FILTER(WHERE ip_hash=$2)::int address_failures FROM auth_failures WHERE (login=$1 OR ip_hash=$2) AND created_at>now()-interval '30 minutes'",[login,ip]);if(n.rows[0].account_failures>=5||n.rows[0].address_failures>=25)S.fail('Trop de tentatives. Réessayez dans 30 minutes.',429);return ip}
@@ -86,5 +86,5 @@ async function build(options={}){const pool=await connectDatabase(process.env.DA
  app.use('/api',(req,res)=>res.status(404).json({error:'Ressource introuvable.'}));app.get('*',(req,res)=>res.status(404).sendFile(path.join(web,'not-found.html')));app.use(errorHandler);
  return {app,pool,push,reminders,courier}
 }
-if(require.main===module){build().then(({app,push,reminders,courier})=>app.listen(PORT,'0.0.0.0',()=>{reminders.start();push.start();courier.start();console.log('DRENAET CI — bureau et formation continue : serveur prêt sur le port '+PORT)})).catch(e=>{console.error('Démarrage refusé :',e.message);process.exitCode=1})}
+if(require.main===module){console.log('DRENAET CI — lancement version '+require('./package.json').version);build().then(({app,push,reminders,courier})=>app.listen(PORT,'0.0.0.0',()=>{reminders.start();push.start();courier.start();console.log('DRENAET CI — bureau et formation continue : serveur prêt sur le port '+PORT)})).catch(e=>{console.error('Démarrage refusé :',e.message);process.exitCode=1})}
 module.exports={build};

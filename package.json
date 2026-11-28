@@ -1,6 +1,6 @@
 {
   "name": "drenaet-ci",
-  "version": "0.28.0",
+  "version": "0.29.0",
   "private": true,
   "description": "DRENAET CI — étape 26 : hiérarchie régionale, structures, établissements et accès tracés",
   "engines": {
