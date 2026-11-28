@@ -1,0 +1,19 @@
+compte_fictif,role,page,etat_necessaire,action,identifiant_cible,statut,preuve
+school_head.test.local,school_head,coges,brouillon fictif ouvert,fg:dossier,2,OUVERTURE_ET_ETAT_TESTES,staging/verify-governance-ui.log
+school_head.test.local,school_head,coges,brouillon fictif ouvert,formulaire:fg:edit,2,MODIFICATION_SQL_TESTEE,staging/verify-governance-ui.log
+school_head.test.local,school_head,coges,brouillon fictif ouvert,formulaire:fg:file,2,PIECE_FICTIVE_SIGNEE_SQL_TESTEE,staging/verify-governance-ui.log
+school_head.test.local,school_head,coges,piece fictive présente,fg:file,1,TELECHARGEMENT_SHA256_TESTE,staging/verify-governance-ui.log
+school_head.test.local,school_head,coges,brouillon fictif ouvert,fg:decision:validate,2,TRANSITION_SQL_TESTEE,staging/verify-governance-ui.log
+regional_director.test.local,regional_director,coges,dossier validé ouvert,fg:decision:publish,2,PUBLICATION_SQL_TESTEE,staging/verify-governance-ui.log
+regional_director.test.local,regional_director,coges,dossier publié ouvert,fg:export,2,PDF_NON_VIDE_TESTE,staging/verify-governance-ui.log
+school_head.test.local,school_head,examinations,brouillon fictif ouvert,fg:decision:submit,3,TRANSITION_SQL_TESTEE,staging/verify-governance-ui.log
+regional_director.test.local,regional_director,examinations,dossier régional ouvert,fg:decision:regional_validate,3,VISA_SQL_TESTE,staging/verify-governance-ui.log
+admin.test.local,platform_admin,examinations,dossier national ouvert,fg:decision:national_validate,3,VISA_SQL_TESTE,staging/verify-governance-ui.log
+admin.test.local,platform_admin,examinations,dossier validé ouvert,fg:decision:publish,3,PUBLICATION_SQL_TESTEE,staging/verify-governance-ui.log
+admin.test.local,platform_admin,examinations,dossier publié ouvert,fg:export,3,PDF_NON_VIDE_TESTE,staging/verify-governance-ui.log
+teacher.test.local,teacher,calendar,événement privé fictif visible,formulaire:res:new-event,1,CREATION_ET_ISOLATION_TESTEES,staging/verify-teacher-calendar-ui.log
+teacher.test.local,teacher,calendar,événement privé fictif visible,res:open-event,1,OUVERTURE_TESTEE,staging/verify-teacher-calendar-ui.log
+teacher.test.local,teacher,calendar,événement privé fictif ouvert,res:edit-event,1,FORMULAIRE_MODIFICATION_TESTE,staging/verify-teacher-calendar-ui.log
+teacher.test.local,teacher,calendar,événement privé fictif modifié,formulaire:res:edit-event,1,REVISION_SQL_TESTEE,staging/verify-teacher-calendar-ui.log
+teacher.test.local,teacher,calendar,événement privé fictif modifié,res:cancel-event,1,ANNULATION_ET_HISTORIQUE_SQL_TESTES,staging/verify-teacher-calendar-ui.log
+school_head.test.local,school_head,grades,fenêtre de délégation ouverte,formulaire:grade:delegate,9,REVOCATION_ET_RESTAURATION_SQL_TESTEES,staging/audit-head-ace-grades-ui.log

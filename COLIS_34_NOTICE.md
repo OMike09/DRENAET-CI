@@ -1,0 +1,12 @@
+# Colis cumulatif 34 — audit rôle par rôle (delta préparé, non déployé)
+
+Delta à appliquer **après le colis 29**, sur une copie sauvegardée et distincte. Il rassemble les modifications des colis 30–34 et les deux corrections découvertes pendant la recette du clone. Il ne supprime pas de fonctionnalité existante, n’ajoute ni migration ni dépendance, et n’est pas une installation autonome. Version locale : `0.34.0`. **NE PAS DÉPLOYER à ce stade ; Render n’a pas été modifié.**
+
+Correctifs complémentaires :
+- `web/family-governance-ui.js` : le bouton « Retour aux parents » rafraîchit désormais le catalogue après une invitation/proposition ; régression dédiée dans `tests/audit-roles-parent-ace-browser.test.js`.
+- `web/roll-calls-ui.js` : « Contrôler les appels manquants » définissait `from` mais pas `to`, et affichait `to is not defined` sans appeler l’API. Date de fin définie ; 3/3 clics HTTP 200 et fenêtre ouverte sur clone, régression Chromium dans `tests/roll-calls-postgres.test.js`.
+- Correctif antérieur : l’Observatoire global n’affiche plus les onglets « Alertes » et « Déclarations » interdits par le serveur ; les rubriques autorisées des responsables locaux restent disponibles. Les correctifs Parents, ACE, profil administrateur, annonces et récupération guidée sont conservés.
+
+Validation locale **après** ces correctifs : suite complète PostgreSQL jetable + Chromium **63/63, zéro ignoré** ; contrôle de 19 authentifications fictives et refus ciblés ; rôle de base fictif revenu à `NOCREATEDB`. Inventaire initial : 1 881 occurrences de boutons et 204 formulaires avec statut de preuve, zéro entrée laissée `NON_TESTE_FONCTIONNELLEMENT`, **sans prétendre que toutes les actions fonctionnent** : 359 boutons n’ont ouvert qu’un formulaire sans soumission, 97 une modale, et deux formulaires régionaux sont cachés. Voir `RAPPORT_FINAL_34_DECISION_DEPLOIEMENT.md` pour la matrice et le verdict.
+
+Le clone local contient uniquement des essais fictifs ; les comptes auxiliaires créés pour les prérequis de la région B ont été archivés. Aucun identifiant ni mot de passe réel n’est inclus. Les secrets, sauvegardes, bases et journaux bruts ne sont **pas dans le ZIP**. Ne pas exécuter la suite de tests contre une base réelle : elle crée et supprime des bases temporaires. Lors du dernier contrôle **anonyme** sur Render, `/healthz` indiquait `0.29.0` ; aucune conclusion ne peut être tirée sur ses parcours authentifiés. Les tests « mobile » correspondent à des viewports Chromium, pas à des appareils physiques.
