@@ -1,0 +1,10 @@
+Colis 27 : delta essentiel à appliquer après le colis 26. Ce delta ne résout pas le quota PostgreSQL.
+
+7210fbeb5f40bc4cbe4057c7dc7feba09a20ad914c2b0ba43b899d2706a1b883  README.md
+8b29d5b6842b9c0f03887c40d88d9885f11aa36596c078f3bad8eee9f4ac4aee  package.json
+034d1ad3bda1beef6b65dacbb50f02b113a31f7eebffbd71d4e5539616d0dc0b  package-lock.json
+e41c853da98175c947656396d9912b82b364a778c4c04a605514f27bc44e66af  server.js
+f6d4533cfd317c1054700afe0542aff4a4f05a07368e134af0c185540b699ebf  hierarchy.js
+8868cb42b1114b5dcb7f140f25a58a26dd9b1e708958e7bd77cf9f384c8a9812  web/hierarchy-ui.js
+373429c9b337b3aa5b476dfcbcd95b788bba0c00b2ebf697a9c801e6b9373b90  tests/hierarchy25-postgres.test.js
+d81c8d7fd4961b12084cf28e5d81ff078b9a91180f6660f149777cac9ecda166  ETAPE_27_SUPERVISION_DIAGNOSTIC.md

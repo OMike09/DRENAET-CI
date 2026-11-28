@@ -1,4 +1,6 @@
-# DRENAET CI — application intégrée (version 0.26.0)
+# DRENAET CI — application intégrée (version 0.27.0)
+
+**Étape 27 : supervision régionale représentée et diagnostic de disponibilité.** Lire [le guide du delta 27](ETAPE_27_SUPERVISION_DIAGNOSTIC.md). Attention : ce colis ne relève aucun quota PostgreSQL et ne rétablit pas un service suspendu.
 
 **Étape 26 : hiérarchie et rattachements réels.** Lire [le guide du delta essentiel et ses limites](ETAPE_26_HIERARCHIE_DELTA_ESSENTIEL.md). Ce delta s'applique uniquement après l'étape 25 ; le projet n'a été vérifié que localement. Les paragraphes historiques ci-dessous ne décrivent pas seuls l’état actuel. Ne jamais déployer sur une base de production sans sauvegarde, restauration testée et recette en préproduction.
 
