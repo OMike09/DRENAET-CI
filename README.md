@@ -1,4 +1,6 @@
-# DRENAET CI — application intégrée (version 0.27.0)
+# DRENAET CI — application intégrée (version 0.28.0)
+
+**Étape 28 : améliorations ciblées des emplois du temps et annonces, non-refonte exhaustive.** Lire [le rapport et les limites du delta 28](ETAPE_28_EMPLOIS_ANNONCES_RAPPORT.md). Appliquer uniquement après le delta 27 et après sauvegarde/restauration de préproduction.
 
 **Étape 27 : supervision régionale représentée et diagnostic de disponibilité.** Lire [le guide du delta 27](ETAPE_27_SUPERVISION_DIAGNOSTIC.md). Attention : ce colis ne relève aucun quota PostgreSQL et ne rétablit pas un service suspendu.
 
